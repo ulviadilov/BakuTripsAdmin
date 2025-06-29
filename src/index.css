@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+@theme {
+    /* *Colors */
+    --color-primary: var(--primary);
+    --color-primary-nav: var(--primary-nav);
+    --color-medium: var(--medium);
+    --color-backg: var(--backg);
+    --color-bg-black-20: var(--bg-black-20);
+    --color-title-light: var(--title-ligth);
+    --color-white-light: var(--white-light);
+    --color-dark: var(--dark);
+    --color-line: var(--line);
+    --color-light: var(--light);
+    --color-note: var(--note);
+    --color-tab: var(--tab);
+    --color-input: var(--input);
+    --color-alert-green: var(--alert-green);
+    --color-alert-red: var(--alert-red);
+    --color-alert-blue: var(--alert-blue);
+    --color-alert-red-bg: var(--alert-red-bg);
+    --color-alert-green-bg: var(--alert-green-bg);
+    --color-alert-blue-bg: var(--alert-blue-bg);
+    --color-alert-star: var(--alert-star);
+    --color-alert-note: var(--alert-note);
+    --color-glass-10: var(--glass-10);
+    --color-glass-30: var(--glass-30);
+    --color-cards-40: var(--cards-40);
+    --color-tag: var(--tag);
+    --color-note-light: var(--note-light);
+    --color-main: var(--main);
+    --color-packages: var(--packages);
+    --color-stroke: var(--stroke);
+
+    /* *Font Size */
+    --text-xs: 12px;
+    --text-sm: 14px;
+    --text-base: 16px; /* Default body text */
+    --text-md: 18px;
+    --text-lg: 20px;
+    --text-xl: 24px;
+    --text-2xl: 26px;
+    --text-3xl: 28px;
+    --text-4xl: 32px;
+    --text-5xl: 36px;
+    --text-6xl: 40px;
+    --text-7xl: 42px;
+    --text-8xl: 56px;
+    --text-9xl: 64px;
+    --text-10xl: 66px;
+
+    /* *Line-height */
+    --leading-normal: 1;
+    --leading-snug: 1.2;
+    --leading-tight: 1.25;
+    --leading-loose: 1.5;
+
+    /* Box Shadow */
+    --shadow-primary: 0px -2px 2px 0px #0f2244 inset,
+        0px 0px 0px 0px #0f2244 inset, 0px 0px 1px 1px rgba(21, 50, 101, 0.2);
+
+    --shadow-button: 0px 1px 2px 0px rgba(0, 0, 0, 0.03);
+
+    /* Border color */
+    --color-border-hover: var(--border-hover);
+    --color-border-focus: var(--border-focus);
+    --color-border-selected: var(--border-selected);
+}
+
+:root {
+    --primary: #1b2c4a;
+    --primary-nav: rgba(27, 44, 74, 0.5);
+    --bg-black-20: rgba(0, 0, 0, 0.2);
+    --medium: #48556d;
+    --title-ligth: #6a7588;
+    --white-light: #e9e9e9;
+    --backg: #fbfbfb;
+    --dark: #162847;
+    --light: #989898;
+    --note: #fe8964;
+    --tab: #142b55;
+    --line: #e3dbd8;
+    --input: #dedede;
+    --alert-green: #4fae66;
+    --alert-red: #ab0909;
+    --alert-blue: #3772d9;
+    --alert-star: #ffd700;
+    --alert-note: #ff5722;
+    --alert-red-bg: rgba(171, 9, 9, 0.08);
+    --alert-green-bg: rgba(15, 153, 24, 0.08);
+    --alert-blue-bg: rgba(54, 122, 255, 0.08);
+    --glass-10: rgb(174, 174, 174, 10%);
+    --glass-30: rgb(173, 173, 173, 30%);
+    --cards-40: rgb(27, 44, 74, 40%);
+    --tag: #f1f4f4;
+    --note-light: #fbebe5;
+    --main: #fbfbfb;
+    --stroke: #d5e1e4;
+    --packages: #f1f4f4;
+    --radius: 0.625rem;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+    /* Border color */
+    --border-hover: #858585;
+    --border-focus: #367aff;
+    --border-selected: #667a9d;
+}
