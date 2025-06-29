@@ -233,6 +233,7 @@ export default function TourCreate() {
 
             <div className="w-full max-w-6xl">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+
                     {/* Basic Information Section */}
                     <div className="bg-white p-6 rounded-lg border border-gray-200">
                         <h2 className="text-lg font-semibold text-gray-900 mb-4">

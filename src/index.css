@@ -132,3 +132,8 @@
     --border-focus: #367aff;
     --border-selected: #667a9d;
 }
+
+body {
+    height: 100vh;
+    overflow: hidden;
+}

@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router';
 import {
   Menu,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  LogOut,
+  User
 } from 'lucide-react';
 import classNames from 'classnames';
 import { navItems } from '../constants/path';
@@ -25,7 +27,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   onClose,
 }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+  const popupRef = useRef<HTMLDivElement>(null);
 
   const toggleExpanded = (label: string) => {
     if (isCollapsed) return;
@@ -38,6 +43,43 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const isItemExpanded = (label: string) => expandedItems.includes(label);
+
+  const handleLogout = () => {
+    // Clear token from localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('accessToken');
+    // Clear any other auth-related items you might have
+    localStorage.removeItem('user');
+    localStorage.removeItem('userData');
+
+    // Close popup
+    setShowLogoutPopup(false);
+
+    // Redirect to login
+    navigate('/login');
+  };
+
+  const handleUserClick = () => {
+    setShowLogoutPopup(!showLogoutPopup);
+  };
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+        setShowLogoutPopup(false);
+      }
+    };
+
+    if (showLogoutPopup) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showLogoutPopup]);
 
   const isAnyChildActive = (children: any[]): boolean => {
     if (!children) return false;
@@ -429,27 +471,74 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </nav>
 
-        <div className="p-4 border-t border-line flex-shrink-0">
+        <div className="p-4 border-t border-line flex-shrink-0 relative">
           {!isCollapsed ? (
-            <div className="flex items-center space-x-3 px-4 py-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-alert-green to-alert-blue rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-semibold">A</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-dark truncate">Admin User</p>
-                <p className="text-xs text-medium truncate">admin@example.com</p>
-              </div>
+            <div className="relative">
+              <button
+                onClick={handleUserClick}
+                className="flex items-center space-x-3 px-4 py-2 w-full hover:bg-tag/30 rounded-lg transition-colors duration-200"
+              >
+                <div className="w-8 h-8 bg-gradient-to-br from-alert-green to-alert-blue rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-semibold">A</span>
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-dark truncate">Admin User</p>
+                  <p className="text-xs text-medium truncate">admin@example.com</p>
+                </div>
+                <ChevronUp className={classNames(
+                  "w-4 h-4 text-medium transition-transform duration-200",
+                  { "rotate-180": !showLogoutPopup }
+                )} />
+              </button>
+
+              {/* Logout Popup */}
+              {showLogoutPopup && (
+                <div
+                  ref={popupRef}
+                  className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-line shadow-xl rounded-lg py-2 z-50 animate-in slide-in-from-bottom-2 duration-200"
+                >
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-3 px-4 py-2.5 w-full hover:bg-red-50 transition-colors duration-200 text-red-600 hover:text-red-700"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="text-sm font-medium">Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex justify-center relative group">
-              <div className="w-8 h-8 bg-gradient-to-br from-alert-green to-alert-blue rounded-full flex items-center justify-center">
+              <button
+                onClick={handleUserClick}
+                className="w-8 h-8 bg-gradient-to-br from-alert-green to-alert-blue rounded-full flex items-center justify-center hover:scale-105 transition-transform duration-200"
+              >
                 <span className="text-white text-xs font-semibold">A</span>
-              </div>
+              </button>
 
+              {/* Collapsed User Tooltip */}
               <div className="fixed left-[4.5rem] ml-3 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap z-[100] pointer-events-none shadow-lg">
                 Admin User
                 <div className="absolute right-full top-1/2 -translate-y-1/2 border-[6px] border-transparent border-r-gray-800"></div>
               </div>
+
+              {/* Logout Popup for Collapsed Sidebar */}
+              {showLogoutPopup && (
+                <div
+                  ref={popupRef}
+                  className="fixed left-[4.5rem] ml-3 bg-white border border-line shadow-xl rounded-lg py-2 z-[200] min-w-[120px] bottom-16"
+                >
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-2 px-3 py-2 w-full hover:bg-red-50 transition-colors duration-200 text-red-600 hover:text-red-700"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="text-sm font-medium">Logout</span>
+                  </button>
+                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-[6px] border-transparent border-r-white"></div>
+                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-[6px] border-transparent border-r-line" style={{ marginRight: '1px' }}></div>
+                </div>
+              )}
             </div>
           )}
         </div>

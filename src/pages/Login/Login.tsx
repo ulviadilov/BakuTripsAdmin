@@ -7,9 +7,9 @@ import * as yup from "yup";
 import Input from "../../components/Input";
 import { authService } from "../../services/auth";
 
-// Add these imports (make sure to have these assets in your project)
 import TravelIllustration from "../../assets/World-Travel-PNG-Photos.png";
 import Logo from "../../assets/logo.jpg";
+import { paths } from "../../constants/path";
 
 interface LoginFormData {
     email: string;
@@ -32,7 +32,7 @@ export default function LoginPage() {
 
     const {
         control,
-        // handleSubmit,
+        handleSubmit,
         reset,
         formState: { errors },
     } = useForm<LoginFormData>({
@@ -45,12 +45,11 @@ export default function LoginPage() {
 
     const mutation = useMutation({
         mutationFn: authService.login,
-        onSuccess: () => {
+        onSuccess: (data) => {
             toast.success("Login successful");
-            // localStorage.setItem("token", data.token);
-            // localStorage.setItem("user", JSON.stringify(data.user));
+            localStorage.setItem("token", data?.data?.token);
             reset();
-            navigate("/dashboard");
+            navigate(paths.DASHBOARD);
         },
         onError: (error) => {
             console.error(error);
@@ -58,21 +57,17 @@ export default function LoginPage() {
         },
     });
 
-    // const onSubmit = async (data: LoginFormData) => {
-    //     // mutation.mutate(data);
-    // };
+    const onSubmit = async (data: LoginFormData) => {
+        mutation.mutate(data);
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-100 relative overflow-hidden">
-            {/* Background elements */}
-
-            {/* Decorative elements */}
             <div className="absolute top-0 left-0 w-32 h-32 bg-blue-200 rounded-full filter blur-3xl opacity-30 mix-blend-multiply"></div>
             <div className="absolute bottom-0 right-0 w-32 h-32 bg-cyan-200 rounded-full filter blur-3xl opacity-30 mix-blend-multiply"></div>
 
             <div className="relative z-10 w-full max-w-6xl mx-4">
                 <div className="bg-white rounded-2xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-2">
-                    {/* Left side - Illustration */}
                     <div className="hidden lg:flex flex-col items-center justify-center p-12 bg-gradient-to-br from-blue-500 to-cyan-600 text-white">
                         <img
                             src={TravelIllustration}
@@ -80,18 +75,19 @@ export default function LoginPage() {
                             className="w-full max-w-md mb-8 rounded-3xl opacity-50 grayscale-50"
                         />
                         <div className="text-center">
-                            <h2 className="text-3xl font-bold mb-4">Explore the World</h2>
+                            <h2 className="text-3xl font-bold mb-4">
+                                Explore the World
+                            </h2>
                             <p className="text-blue-100">
-                                Join thousands of travelers discovering amazing destinations around the globe.
+                                Join thousands of travelers discovering amazing
+                                destinations around the globe.
                             </p>
                         </div>
 
-                        {/* Decorative circles */}
                         <div className="absolute top-8 left-8 w-16 h-16 border-4 border-white rounded-full opacity-20"></div>
                         <div className="absolute bottom-8 right-8 w-24 h-24 border-4 border-white rounded-full opacity-20"></div>
                     </div>
 
-                    {/* Right side - Login Form */}
                     <div className="p-8 sm:p-12">
                         <div className="flex justify-center mb-8">
                             <img
@@ -110,7 +106,10 @@ export default function LoginPage() {
                             </p>
                         </div>
 
-                        <form className="space-y-6">
+                        <form
+                            onSubmit={handleSubmit(onSubmit)}
+                            className="space-y-6"
+                        >
                             <Input
                                 name="email"
                                 control={control}
@@ -144,8 +143,19 @@ export default function LoginPage() {
                                             fill="none"
                                             viewBox="0 0 24 24"
                                         >
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            ></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                            ></path>
                                         </svg>
                                         Signing in...
                                     </>
@@ -157,7 +167,12 @@ export default function LoginPage() {
                                             stroke="currentColor"
                                             viewBox="0 0 24 24"
                                         >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
+                                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                                            />
                                         </svg>
                                         Sign in
                                     </>
