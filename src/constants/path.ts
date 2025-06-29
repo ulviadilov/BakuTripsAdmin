@@ -66,6 +66,9 @@ export const paths = {
             EDIT: (id = ":id") => `/social/${id}`,
         },
     },
+    AUTH:{
+        LOGIN:"/login"
+    }
 };
 
 import {

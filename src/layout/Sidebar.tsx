@@ -28,7 +28,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   const toggleExpanded = (label: string) => {
-    // Don't toggle if collapsed - children will show in dropdown instead
     if (isCollapsed) return;
 
     setExpandedItems(prev =>
@@ -40,7 +39,6 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const isItemExpanded = (label: string) => expandedItems.includes(label);
 
-  // Check if any child or nested child is active
   const isAnyChildActive = (children: any[]): boolean => {
     if (!children) return false;
 
@@ -53,7 +51,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  // Render nested children recursively
   const renderNestedChildren = (children: any[], level: number = 1) => {
     return children.map((child: any, childIndex: number) => {
       const isChildItemActive = location.pathname === child.path;
@@ -66,7 +63,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       return (
         <div key={`${child.label}-${childIndex}-${level}`}>
           {hasNestedChildren ? (
-            // Child with nested children
             <>
               <button
                 onClick={() => toggleExpanded(`${child.label}-${level}`)}
@@ -118,7 +114,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                 )}
               </button>
 
-              {/* Nested children */}
               <div className={classNames(
                 'overflow-hidden transition-all duration-300 ease-in-out',
                 {
@@ -132,7 +127,6 @@ const Sidebar: React.FC<SidebarProps> = ({
               </div>
             </>
           ) : (
-            // Regular child item
             <Link
               to={child.path}
               onClick={onClose}
@@ -175,7 +169,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  // Render dropdown for collapsed state with nested support
   const renderCollapsedDropdown = (children: any[], parentLabel: string) => {
     const renderDropdownItems = (items: any[], level: number = 0) => {
       return items.map((child: any, childIndex: number) => {
@@ -198,7 +191,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 to={child.path}
                 onClick={onClose}
                 className={classNames(
-                  `flex  items-center px-3 py-2.5 text-sm font-medium hover:bg-tag/50 transition-colors duration-200 ${paddingLeft}`,
+                  `flex items-center px-3 py-2.5 text-sm font-medium hover:bg-tag/50 transition-colors duration-200 ${paddingLeft}`,
                   {
                     'bg-gradient-to-r from-primary to-tab text-white': isChildItemActive,
                     'text-medium': !isChildItemActive,
@@ -215,14 +208,15 @@ const Sidebar: React.FC<SidebarProps> = ({
     };
 
     return (
-      <div className="absolute left-full top-0 ml-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] pointer-events-none group-hover:pointer-events-auto">
-        <div className="bg-white border border-line shadow-xl rounded-lg py-2 min-w-48 max-h-80 overflow-y-auto">
+      <div className="fixed bottom-[70px] left-[4.5rem] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] pointer-events-none group-hover:pointer-events-auto">
+        <div className="bg-white border border-line shadow-xl rounded-lg py-2 min-w-48 max-h-80 overflow-y-auto" style={{
+            scrollbarWidth:"none"
+        }}>
           <div className="px-3 py-2 border-b border-line">
             <span className="text-sm font-medium text-dark">{parentLabel}</span>
           </div>
           {renderDropdownItems(children)}
         </div>
-        {/* Arrow pointing to the left */}
         <div className="absolute right-full top-4 border-[8px] border-transparent border-r-white"></div>
         <div className="absolute right-full top-4 border-[8px] border-transparent border-r-line" style={{ marginRight: '1px' }}></div>
       </div>
@@ -239,7 +233,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     return (
       <div key={`${label}-${index}`} className="relative group">
         {hasChildren ? (
-          // Parent item with children
           <>
             <button
               onClick={() => toggleExpanded(label)}
@@ -290,7 +283,6 @@ const Sidebar: React.FC<SidebarProps> = ({
               )}
             </button>
 
-            {/* Children items - only show when not collapsed */}
             {!isCollapsed && (
               <div className={classNames(
                 'overflow-hidden transition-all duration-300 ease-in-out',
@@ -305,58 +297,60 @@ const Sidebar: React.FC<SidebarProps> = ({
               </div>
             )}
 
-            {/* Dropdown menu for collapsed state */}
             {isCollapsed && hasChildren && renderCollapsedDropdown(children, label)}
           </>
         ) : (
-          // Regular item without children
-          <Link
-            to={path}
-            onClick={onClose}
-            className={classNames(
-              'group flex items-center px-4 py-3.5 rounded-xl text-sm font-medium',
-              'transition-all duration-200 ease-in-out relative overflow-hidden w-full',
-              {
-                'bg-gradient-to-r from-primary to-tab text-white shadow-lg shadow-primary/25': isActive,
-                'text-dark hover:bg-tag hover:text-dark': !isActive,
-              }
-            )}
-          >
-            {isActive && (
-              <div className="absolute inset-0 bg-gradient-to-r from-primary to-tab opacity-10" />
-            )}
+          <>
+            <Link
+              to={path}
+              onClick={onClose}
+              className={classNames(
+                'group flex items-center px-4 py-3.5 rounded-xl text-sm font-medium',
+                'transition-all duration-200 ease-in-out relative overflow-hidden w-full',
+                {
+                  'bg-gradient-to-r from-primary to-tab text-white shadow-lg shadow-primary/25': isActive,
+                  'text-dark hover:bg-tag hover:text-dark': !isActive,
+                }
+              )}
+            >
+              {isActive && (
+                <div className="absolute inset-0 bg-gradient-to-r from-primary to-tab opacity-10" />
+              )}
 
-            <Icon className={classNames(
-              'flex-shrink-0 transition-transform duration-200',
-              {
-                'w-5 h-5': true,
-                'group-hover:scale-110': !isActive,
-                'text-white': isActive,
-                'text-medium group-hover:text-dark': !isActive,
-              }
-            )} />
+              <Icon className={classNames(
+                'flex-shrink-0 transition-transform duration-200',
+                {
+                  'w-5 h-5': true,
+                  'group-hover:scale-110': !isActive,
+                  'text-white': isActive,
+                  'text-medium group-hover:text-dark': !isActive,
+                }
+              )} />
 
-            {!isCollapsed && (
-              <span className={classNames(
-                'ml-4 transition-all duration-200 group-hover:scale-105',
-                { 'opacity-0': isCollapsed }
-              )}>
+              {!isCollapsed && (
+                <span className={classNames(
+                  'ml-4 transition-all duration-200 group-hover:scale-105',
+                  { 'opacity-0': isCollapsed }
+                )}>
+                  {label}
+                </span>
+              )}
+
+              {!isActive && (
+                <div className="absolute inset-0 bg-gradient-to-r from-tag to-packages opacity-0 transition-opacity duration-200 rounded-xl" />
+              )}
+            </Link>
+
+            {isCollapsed && !hasChildren && (
+              <div
+                className="fixed left-[4.5rem] ml-3 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap z-[400] pointer-events-none shadow-lg"
+                style={{ top: `calc(${index * 56}px + 100px)` }}
+              >
                 {label}
-              </span>
+                <div className="absolute right-full top-1/2 -translate-y-1/2 border-[6px] border-transparent border-r-gray-800"></div>
+              </div>
             )}
-
-            {!isActive && (
-              <div className="absolute inset-0 bg-gradient-to-r from-tag to-packages opacity-0 transition-opacity duration-200 rounded-xl" />
-            )}
-          </Link>
-        )}
-
-        {/* Simple tooltip for collapsed sidebar (items without children) */}
-        {isCollapsed && !hasChildren && (
-          <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap z-[100] pointer-events-none shadow-lg">
-            {label}
-            <div className="absolute right-full top-1/2 -translate-y-1/2 border-[6px] border-transparent border-r-gray-800"></div>
-          </div>
+          </>
         )}
       </div>
     );
@@ -364,7 +358,6 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 lg:hidden"
@@ -430,8 +423,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        <nav className="mt-6 px-4 flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-          <div className="space-y-2">
+        <nav className="mt-6 px-4 flex-1 relative" style={{ overflow: 'visible' }}>
+          <div className="space-y-2" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)',scrollbarWidth:"none" }}>
             {navItems.map((item, index) => renderNavItem(item, index))}
           </div>
         </nav>
@@ -453,10 +446,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <span className="text-white text-xs font-semibold">A</span>
               </div>
 
-              {/* Admin tooltip - Fixed positioning and z-index */}
-              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap z-[100] pointer-events-none shadow-lg">
+              <div className="fixed left-[4.5rem] ml-3 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap z-[100] pointer-events-none shadow-lg">
                 Admin User
-                {/* Arrow pointing to the left */}
                 <div className="absolute right-full top-1/2 -translate-y-1/2 border-[6px] border-transparent border-r-gray-800"></div>
               </div>
             </div>

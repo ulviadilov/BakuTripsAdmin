@@ -11,7 +11,7 @@ import CategoryEdit from "../pages/Category/CategoryEdit";
 import GroupTour from "../pages/GroupTour/TourList";
 import GroupTourEdit from "../pages/GroupTour/TourEdit";
 import GroupTourCreate from "../pages/GroupTour/TourCreate";
-import GroupTourDetail from '../pages/GroupTour/TourDetail'
+import GroupTourDetail from "../pages/GroupTour/TourDetail";
 
 import PrivateTour from "../pages/PrivateTour/TourList";
 import PrivateTourEdit from "../pages/PrivateTour/TourEdit";
@@ -41,12 +41,17 @@ import TourOptionDetail from "../pages/PackageTour/TourOption/TourOptionDetail";
 import DailyProgramList from "../pages/PackageTour/DailyProgram/DailyProgramList";
 import DailyProgramCreate from "../pages/PackageTour/DailyProgram/DailyProgramCreate";
 import DailyProgramEdit from "../pages/PackageTour/DailyProgram/DailyProgramEdit";
-
+import LoginPage from "../pages/Login/Login";
+import AuthGuard from "../layout/AuthGuard";
 
 export const router = createBrowserRouter([
     {
-        path: "",
-        element: <MainLayout />,
+        path: "/",
+        element: (
+            <AuthGuard>
+                <MainLayout />
+            </AuthGuard>
+        ),
         children: [
             {
                 path: paths.DASHBOARD,
@@ -61,137 +66,149 @@ export const router = createBrowserRouter([
                 element: <AddPartner />,
             },
             {
-                path:paths.CATEGORY.LIST,
-                element:<CategoryList/>
+                path: paths.CATEGORY.LIST,
+                element: <CategoryList />,
             },
             {
-                path:paths.CATEGORY.CREATE,
-                element:<CategoryCreate/>,
+                path: paths.CATEGORY.CREATE,
+                element: <CategoryCreate />,
             },
             {
-                path:paths.CATEGORY.EDIT(),
-                element:<CategoryEdit/>
+                path: paths.CATEGORY.EDIT(),
+                element: <CategoryEdit />,
             },
             {
-                path:paths.GROUP_TOUR.LIST,
-                element:<GroupTour/>
+                path: paths.GROUP_TOUR.LIST,
+                element: <GroupTour />,
             },
             {
-                path:paths.GROUP_TOUR.CREATE,
-                element:<GroupTourCreate/>
+                path: paths.GROUP_TOUR.CREATE,
+                element: <GroupTourCreate />,
             },
             {
-                path:paths.GROUP_TOUR.EDIT(),
-                element:<GroupTourEdit/>
+                path: paths.GROUP_TOUR.EDIT(),
+                element: <GroupTourEdit />,
             },
             {
-                path:paths.GROUP_TOUR.DETAIL(),
-                element:<GroupTourDetail/>
+                path: paths.GROUP_TOUR.DETAIL(),
+                element: <GroupTourDetail />,
             },
             {
-                path:paths.PACKAGE_TOUR_PACKAGE.LIST,
-                element:<PackageTour/>
+                path: paths.PACKAGE_TOUR_PACKAGE.LIST,
+                element: <PackageTour />,
             },
             {
-                path:paths.PACKAGE_TOUR_PACKAGE.CREATE,
-                element:<PackageTourCreate/>
+                path: paths.PACKAGE_TOUR_PACKAGE.CREATE,
+                element: <PackageTourCreate />,
             },
             {
-                path:paths.PACKAGE_TOUR_PACKAGE.EDIT(),
-                element:<PackageTourEdit/>
+                path: paths.PACKAGE_TOUR_PACKAGE.EDIT(),
+                element: <PackageTourEdit />,
             },
             {
-                path:paths.PACKAGE_TOUR_OPTION.LIST,
-                element:<TourOptionList/>
+                path: paths.PACKAGE_TOUR_OPTION.LIST,
+                element: <TourOptionList />,
             },
             {
-                path:paths.PACKAGE_TOUR_OPTION.DETAIL(),
-                element:<TourOptionDetail/>
+                path: paths.PACKAGE_TOUR_OPTION.DETAIL(),
+                element: <TourOptionDetail />,
             },
             {
-                path:paths.PACKAGE_TOUR_OPTION.CREATE,
-                element:<TourOptionCreate/>
+                path: paths.PACKAGE_TOUR_OPTION.CREATE,
+                element: <TourOptionCreate />,
             },
             {
-                path:paths.PACKAGE_TOUR_OPTION.EDIT(),
-                element:<TourOptionEdit/>
+                path: paths.PACKAGE_TOUR_OPTION.EDIT(),
+                element: <TourOptionEdit />,
             },
             {
-                path:paths.PACKAGE_DAILY_PROGRAM.LIST,
-                element:<DailyProgramList/>
+                path: paths.PACKAGE_DAILY_PROGRAM.LIST,
+                element: <DailyProgramList />,
             },
             {
-                path:paths.PACKAGE_DAILY_PROGRAM.CREATE,
-                element:<DailyProgramCreate/>
+                path: paths.PACKAGE_DAILY_PROGRAM.CREATE,
+                element: <DailyProgramCreate />,
             },
             {
-                path:paths.PACKAGE_DAILY_PROGRAM.EDIT(),
-                element:<DailyProgramEdit/>
+                path: paths.PACKAGE_DAILY_PROGRAM.EDIT(),
+                element: <DailyProgramEdit />,
             },
             {
-                path:paths.PRIVATE_TOUR.LIST,
-                element:<PrivateTour/>
+                path: paths.PRIVATE_TOUR.LIST,
+                element: <PrivateTour />,
             },
             {
-                path:paths.PRIVATE_TOUR.CREATE,
-                element:<PrivateTourCreate/>
+                path: paths.PRIVATE_TOUR.CREATE,
+                element: <PrivateTourCreate />,
             },
             {
-                path:paths.PRIVATE_TOUR.EDIT(),
-                element:<PrivateTourEdit/>
+                path: paths.PRIVATE_TOUR.EDIT(),
+                element: <PrivateTourEdit />,
             },
             {
-                path:paths.PRIVATE_TOUR.DETAIL(),
-                element:<PrivateTourDetail/>
+                path: paths.PRIVATE_TOUR.DETAIL(),
+                element: <PrivateTourDetail />,
             },
             {
-                path:paths.PRIVATE_PACKAGE.LIST,
-                element:<PrivatePackageList/>
+                path: paths.PRIVATE_PACKAGE.LIST,
+                element: <PrivatePackageList />,
             },
             {
-                path:paths.PRIVATE_PACKAGE.CREATE,
-                element:<PrivatePackageCreate/>
+                path: paths.PRIVATE_PACKAGE.CREATE,
+                element: <PrivatePackageCreate />,
             },
             {
-                path:paths.PRIVATE_PACKAGE.EDIT(),
-                element:<PrivatePackageEdit/>
+                path: paths.PRIVATE_PACKAGE.EDIT(),
+                element: <PrivatePackageEdit />,
             },
             {
-                path:paths.DESTINATION.LIST,
-                element:<DestinationList/>
+                path: paths.DESTINATION.LIST,
+                element: <DestinationList />,
             },
             {
-                path:paths.DESTINATION.DETAIL(),
-                element:<DestinationDetail/>
+                path: paths.DESTINATION.DETAIL(),
+                element: <DestinationDetail />,
             },
             {
-                path:paths.DESTINATION.CREATE,
-                element:<DestinationCreate/>
+                path: paths.DESTINATION.CREATE,
+                element: <DestinationCreate />,
             },
             {
-                path:paths.DESTINATION.EDIT(),
-                element:<DestinationEdit/>
+                path: paths.DESTINATION.EDIT(),
+                element: <DestinationEdit />,
             },
             {
-                path:paths.USER.LIST,
-                element:<UserList/>
+                path: paths.USER.LIST,
+                element: <UserList />,
             },
             {
-                path:paths.SETTING.CONTACT.LIST,
-                element:<ContactList/>
+                path: paths.SETTING.CONTACT.LIST,
+                element: <ContactList />,
             },
             {
-                path:paths.SETTING.CONTACT.DETAIL(),
-                element:<ContactDetail/>
+                path: paths.SETTING.CONTACT.DETAIL(),
+                element: <ContactDetail />,
             },
             {
-                path:paths.SETTING.CONTACT.CREATE,
-                element:<ContactCreate/>
+                path: paths.SETTING.CONTACT.CREATE,
+                element: <ContactCreate />,
             },
             {
-                path:paths.SETTING.CONTACT.EDIT(),
-                element:<ContactEdit/>
-            }
+                path: paths.SETTING.CONTACT.EDIT(),
+                element: <ContactEdit />,
+            },
         ],
     },
+    {
+        path: paths.AUTH.LOGIN,
+        element: <LoginPage />,
+    },
+    {
+        path:"*",
+        element:(
+            <AuthGuard>
+                <MainLayout/>
+            </AuthGuard>
+        )
+    }
 ]);
