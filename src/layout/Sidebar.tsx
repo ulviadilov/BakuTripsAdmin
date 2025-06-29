@@ -7,7 +7,6 @@ import {
   ChevronDown,
   ChevronUp,
   LogOut,
-  User
 } from 'lucide-react';
 import classNames from 'classnames';
 import { navItems } from '../constants/path';
