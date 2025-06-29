@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import classNames from 'classnames';
 import { navItems } from '../constants/path';
+import Logo from '../assets/Logo.png'
 
 interface SidebarProps {
   isOpen: boolean;
@@ -394,13 +395,13 @@ const Sidebar: React.FC<SidebarProps> = ({
           )}>
             {!isCollapsed && (
               <div className="flex items-end space-x-3 justify-center">
-                  <img src="/src/assets/Logo.png" alt="" className='w-[90px]' />
+                  <img src={Logo} alt="" className='w-[90px]' />
               </div>
             )}
 
             {isCollapsed && (
             <div className="flex items-end space-x-3">
-                  <img src="/src/assets/Logo.png" alt="" className='w-[90px]' />
+                  <img src={Logo} alt="" className='w-[90px]' />
               </div>
             )}
           </div>
