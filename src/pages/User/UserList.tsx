@@ -122,7 +122,7 @@ export default function UserList() {
                     data={updatedItems}
                     title="Users"
                     searchable={false}
-                    actions={true}
+                    actions={false}
                     pagination={paginationProps}
                     onPageChange={handlePageChange}
                     onSearch={handleSearch}
