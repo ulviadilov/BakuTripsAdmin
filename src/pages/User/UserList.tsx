@@ -1,6 +1,4 @@
-import { useNavigate } from "react-router";
 import { Table } from "../../components/Table";
-import { paths } from "../../constants/path";
 import { useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "../../constants/queryKeys";
 import Spinner from "../../components/Spinner";
@@ -37,13 +35,8 @@ const columns = [
     },
 ];
 
-interface RowType {
-    [key: string]: any;
-    id: string;
-}
 
 export default function UserList() {
-    const navigate = useNavigate();
     const [totalCount, setTotalCount] = useState(0);
     const [paginationData, setPaginationData] = useState({
         skip: 0,
@@ -60,12 +53,6 @@ export default function UserList() {
         staleTime: 5 * 60 * 1000,
     });
 
-    const handleEdit = useCallback(
-        (row: RowType) => {
-            navigate(`${paths.USER.EDIT(row.id)}`);
-        },
-        [navigate]
-    );
 
     const handleRetry = useCallback(() => {
         refetch();
@@ -136,7 +123,6 @@ export default function UserList() {
                     title="Users"
                     searchable={false}
                     actions={true}
-                    onEdit={handleEdit}
                     pagination={paginationProps}
                     onPageChange={handlePageChange}
                     onSearch={handleSearch}
