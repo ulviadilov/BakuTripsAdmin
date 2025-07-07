@@ -115,7 +115,7 @@ export default function Dashboard(){
         columns={columns}
         data={sampleData}
         title="Team Members"
-        searchable={true}
+        searchable={false}
         actions={true}
         onView={handleView}
         onEdit={handleEdit}

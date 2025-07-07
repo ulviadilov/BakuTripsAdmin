@@ -77,7 +77,7 @@ export default function DailyProgramCreate() {
     };
 
     const handleBack = () => {
-        navigate(paths.PACKAGE_TOUR_OPTION.LIST);
+        navigate(paths.PACKAGE_DAILY_PROGRAM.LIST);
     };
 
     if (isLoading) {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { paths } from "../constants/path";
 
 export const apiClient = axios.create({
     baseURL: import.meta.env.VITE_APP_BASE_URL,
@@ -31,9 +32,8 @@ apiClient.interceptors.response.use(
         if (error.response?.status === 401 || error.response?.status === 403) {
             // Clear stored token and user data
             localStorage.removeItem("token");
-            localStorage.removeItem("user");
 
-            window.location.href = "/login";
+            window.location.href = paths.AUTH.LOGIN;
         }
 
         return Promise.reject(error);

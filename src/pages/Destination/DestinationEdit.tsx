@@ -11,6 +11,7 @@ import Select from "../../components/Select";
 import { QUERY_KEYS } from "../../constants/queryKeys";
 import { tourService } from "../../services/tours";
 import { useEffect } from "react";
+import { paths } from "../../constants/path";
 
 interface DestinationFormData {
     tourId: string;
@@ -79,7 +80,7 @@ export default function DestinationEdit() {
         mutationFn: (data: DestinationFormData) => destinationService.update(id!, data),
         onSuccess: () => {
             toast.success('Destination updated successfully');
-            navigate('/destination');
+            navigate(paths.DESTINATION.LIST);
         },
         onError: (error: any) => {
             console.error(error);
@@ -96,7 +97,7 @@ export default function DestinationEdit() {
     };
 
     const handleBack = () => {
-        navigate('/destination');
+        navigate(paths.DESTINATION.LIST);
     };
 
     // Loading state
@@ -238,10 +239,10 @@ export default function DestinationEdit() {
                         control={control}
                         accept="image/*"
                         multiple={false}
-                        maxSize={5}
+                        maxSize={100}
                         maxFiles={1}
                         label="Update Destination Image"
-                        description="Drag and drop an image here or click to browse (Max 5MB) - Leave empty to keep current image"
+                        description="Drag and drop an image here or click to browse (Max 100MB) - Leave empty to keep current image"
                         showPreview={true}
                         error={errors.imageFile?.message}
                         required={false}

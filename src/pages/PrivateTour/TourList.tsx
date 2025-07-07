@@ -149,7 +149,7 @@ export default function TourList() {
                 <Table
                     data={updatedItems}
                     creatable={true}
-                    searchable={true}
+                    searchable={false}
                     createButtonText="Create New Tour"
                     title="Tours"
                     actions={true}

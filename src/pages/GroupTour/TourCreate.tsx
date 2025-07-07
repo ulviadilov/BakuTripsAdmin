@@ -539,7 +539,7 @@ export default function TourCreate() {
                                 maxSize={100}
                                 maxFiles={1}
                                 label="Poster Image"
-                                description="Main poster image for the tour (Required, Max 5MB)"
+                                description="Main poster image for the tour (Required, Max 100MB)"
                                 showPreview={true}
                                 error={errors.posterImageFile?.message}
                                 required={true}
@@ -554,7 +554,7 @@ export default function TourCreate() {
                                 maxSize={100}
                                 maxFiles={1}
                                 label="V Image"
-                                description="Optional V image (Max 5MB)"
+                                description="Optional V image (Max 100MB)"
                                 showPreview={true}
                                 error={errors.vrimagefile?.message}
                                 required={false}
@@ -569,7 +569,7 @@ export default function TourCreate() {
                                 maxSize={100}
                                 maxFiles={10}
                                 label="Tour Images"
-                                description="Additional tour images (Optional, Max 10 files, 5MB each)"
+                                description="Additional tour images (Optional, Max 10 files, 100MB each)"
                                 showPreview={true}
                                 error={errors.tourImageFiles?.message}
                                 required={false}

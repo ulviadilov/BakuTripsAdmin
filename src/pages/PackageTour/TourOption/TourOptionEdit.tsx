@@ -612,7 +612,7 @@ export default function TourOptionEdit() {
                                 maxSize={100}
                                 maxFiles={1}
                                 label="VR Image"
-                                description="VR image for the tour (Required, Max 5MB)"
+                                description="VR image for the tour (Required, Max 100MB)"
                                 showPreview={true}
                                 error={errors.vrimagefile?.message}
                                 required={true}
@@ -630,7 +630,7 @@ export default function TourOptionEdit() {
                                 onDelete={handleDelete}
                                 onFilesChange={handleFileChange}
                                 label="Travel Package Images"
-                                description="Additional tour images (Required, Max 10 files, 5MB each)"
+                                description="Additional tour images (Required, Max 10 files, 100MB each)"
                                 showPreview={true}
                                 error={errors.travelPackageImages?.message}
                                 required={true}

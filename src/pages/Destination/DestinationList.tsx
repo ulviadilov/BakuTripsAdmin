@@ -79,9 +79,9 @@ export default function DestinationList() {
         });
     };
 
-    const handleRowClick = (row:RowType)=>{
-        navigate(paths.DESTINATION.DETAIL(row.id))
-    }
+    // const handleRowClick = (row:RowType)=>{
+    //     navigate(paths.DESTINATION.DETAIL(row.id))
+    // }
     const handleConfirmDelete = () => {
         if (deleteModal.name) {
             deleteMutation.mutate(deleteModal.name.id);
@@ -149,7 +149,7 @@ export default function DestinationList() {
                     onCreate={handleCreate}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
-                    onRowClick={handleRowClick}
+                    // onRowClick={handleRowClick}
                 />
             </div>
             <DeleteConfirmationModal

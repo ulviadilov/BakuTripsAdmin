@@ -43,6 +43,7 @@ import DailyProgramCreate from "../pages/PackageTour/DailyProgram/DailyProgramCr
 import DailyProgramEdit from "../pages/PackageTour/DailyProgram/DailyProgramEdit";
 import LoginPage from "../pages/Login/Login";
 import AuthGuard from "../layout/AuthGuard";
+import EditPartner from "../pages/Partners/EditPartner";
 
 export const router = createBrowserRouter([
     {
@@ -64,6 +65,10 @@ export const router = createBrowserRouter([
             {
                 path: paths.PARTNERS.CREATE,
                 element: <AddPartner />,
+            },
+            {
+                path: paths.PARTNERS.EDIT(),
+                element: <EditPartner />,
             },
             {
                 path: paths.CATEGORY.LIST,

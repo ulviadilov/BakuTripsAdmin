@@ -26,7 +26,6 @@ export default function PrivatePackageEdit() {
         queryFn: privateTourService.privateSelect
     });
 
-    // Fetch existing private package data
     const { data: packageData, isPending: isLoadingPackage } = useQuery({
         queryKey: [QUERY_KEYS.privateTour.packages, id],
         queryFn: () => privateTourService.getPackageById(id!),
@@ -47,7 +46,6 @@ export default function PrivatePackageEdit() {
         }
     });
 
-    // Populate form with existing data when it loads
     useEffect(() => {
         if (packageData?.data) {
             reset({
@@ -83,7 +81,6 @@ export default function PrivatePackageEdit() {
         navigate('/private-package');
     };
 
-    // Show loading state while fetching data
     if (isLoadingPackage) {
         return (
             <div className="p-8">
@@ -95,7 +92,6 @@ export default function PrivatePackageEdit() {
         );
     }
 
-    // Show error if package not found
     if (!packageData?.data && !isLoadingPackage) {
         return (
             <div className="p-8">

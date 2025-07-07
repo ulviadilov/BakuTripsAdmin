@@ -8,6 +8,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import classNames from 'classnames';
+import Tooltip from '@mui/material/Tooltip';
 
 interface TableColumn {
   key: string;
@@ -115,7 +116,6 @@ const TableCell: React.FC<{
   row: TableRow;
 }> = ({ column, value, row }) => {
   const { type = 'text', imageSize = 'medium', fallbackText } = column;
-  const [showTooltip, setShowTooltip] = useState(false);
 
   const shouldTruncate = type === 'text' && typeof value === 'string' && value.length > 150;
   const truncatedText = shouldTruncate ? `${value.substring(0, 60)}...` : value;
@@ -138,19 +138,13 @@ const TableCell: React.FC<{
     case 'text':
     default:
       return (
-        <div
+        <Tooltip title={value}>
+            <div
           className="flex items-center relative"
-          onMouseEnter={() => shouldTruncate && setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
         >
           {truncatedText}
-          {shouldTruncate && showTooltip && (
-            <div className="absolute z-10 bottom-full mb-2 px-3 py-2 text-sm text-white bg-gray-800 rounded-lg shadow-lg break-words max-w-xs">
-              {value}
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-800"></div>
-            </div>
-          )}
         </div>
+        </Tooltip>
       );
   }
 };

@@ -274,10 +274,10 @@ export default function TourUpdate() {
                                 control={control}
                                 accept="image/*"
                                 multiple={false}
-                                maxSize={5}
+                                maxSize={100}
                                 maxFiles={1}
                                 label="Poster Image"
-                                description="Replace poster image (Optional, Max 5MB)"
+                                description="Replace poster image (Optional, Max 100MB)"
                                 showPreview={true}
                                 error={errors.posterImagePath?.message}
                                 required={false}

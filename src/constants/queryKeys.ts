@@ -4,6 +4,9 @@ export const QUERY_KEYS = {
     contact: "contact",
     groupTour: "groupTour",
     package: "package",
+    partner:{
+        all:["partner"] as const,
+    },
     tour: {
         all: ["tour"] as const,
         select: ["select"] as const,
@@ -26,4 +29,5 @@ export const QUERY_KEYS = {
         detail: (id: string) =>
             [...QUERY_KEYS.destination.details(), id] as const,
     },
+    profile:["profile"] as const
 };

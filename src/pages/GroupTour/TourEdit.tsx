@@ -13,6 +13,7 @@ import { QUERY_KEYS } from "../../constants/queryKeys";
 import { categoryService } from "../../services/category";
 import Select from "../../components/Select";
 import type {TourFormDataGet } from "../../types";
+import { paths } from "../../constants/path";
 
 const schema = yup.object({
     tourCategoryId: yup.string().required("Tour Category ID is required"),
@@ -159,7 +160,7 @@ export default function TourUpdate() {
             groupTourService.updateTour(id!, data,newImagesFiles,removeIds),
         onSuccess: () => {
             toast.success("Tour updated successfully");
-            navigate("/group-tour");
+            navigate(paths.GROUP_TOUR.LIST);
         },
         onError: (error) => {
             console.error(error);
@@ -172,7 +173,7 @@ export default function TourUpdate() {
     };
 
     const handleBack = () => {
-        navigate("/group-tour");
+        navigate(paths.GROUP_TOUR.LIST);
     };
 
     const handleDelete = (id:string)=>{
@@ -614,10 +615,10 @@ export default function TourUpdate() {
                                 control={control}
                                 accept="image/*"
                                 multiple={false}
-                                maxSize={200}
+                                maxSize={100}
                                 maxFiles={1}
                                 label="Poster Image"
-                                description="Replace poster image (Optional, Max 5MB)"
+                                description="Replace poster image (Optional, Max 100MB)"
                                 showPreview={true}
                                 error={errors.posterImageFile?.message}
                                 required={false}
@@ -632,10 +633,10 @@ export default function TourUpdate() {
                                 control={control}
                                 accept="image/*"
                                 multiple={false}
-                                maxSize={5}
+                                maxSize={100}
                                 maxFiles={1}
                                 label="VR Image"
-                                description="Replace VR image (Optional, Max 5MB)"
+                                description="Replace VR image (Optional, Max 100MB)"
                                 showPreview={true}
                                 error={errors.vrimagefile?.message}
                                 required={false}
@@ -650,10 +651,10 @@ export default function TourUpdate() {
                                 control={control}
                                 accept="image/*"
                                 multiple={true}
-                                maxSize={5}
+                                maxSize={100}
                                 maxFiles={10}
                                 label="Tour Images"
-                                description="Replace tour images (Optional, Max 10 files, 5MB each)"
+                                description="Replace tour images (Optional, Max 10 files, 100MB each)"
                                 showPreview={true}
                                 error={errors.tourImages?.message}
                                 onDelete={handleDelete}

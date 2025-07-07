@@ -84,7 +84,7 @@ export default function DailyProgramUpdate() {
             dailyProgramService.updateDailyProgram(id!, data),
         onSuccess: () => {
             toast.success("Daily program updated successfully");
-            navigate("/daily-program");
+            navigate(paths.PACKAGE_DAILY_PROGRAM.LIST);
         },
         onError: (error) => {
             console.error(error);

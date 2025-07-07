@@ -9,6 +9,11 @@ const login = async (authData:AuthData) => {
     return await apiClient.post("/Auth/admin-login",authData);
 };
 
+const getUser = async()=>{
+    return await apiClient.get('/Users/profile')
+}
+
 export const authService = {
-    login
+    login,
+    getUser
 }

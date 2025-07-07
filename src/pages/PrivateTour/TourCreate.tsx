@@ -12,6 +12,7 @@ import { categoryService } from "../../services/category";
 import Select from "../../components/Select";
 import { privateTourService } from "../../services/privateTour";
 import type { PrivateFormData } from "../../types";
+import { paths } from "../../constants/path";
 
 const schema = yup.object({
   tourcategoryid: yup.string().required("Tour Category ID is required"),
@@ -70,7 +71,7 @@ export default function TourCreate() {
     onSuccess: () => {
       toast.success("Tour created successfully");
       reset();
-      navigate("/group-tour");
+      navigate(paths.PRIVATE_TOUR.LIST);
     },
     onError: (error) => {
       console.error(error);
@@ -83,7 +84,7 @@ export default function TourCreate() {
   };
 
   const handleBack = () => {
-    navigate("/group-tour");
+    navigate(paths.PRIVATE_TOUR.LIST);
   };
 
   return (
@@ -384,7 +385,7 @@ export default function TourCreate() {
                 maxSize={100}
                 maxFiles={1}
                 label="Poster Image"
-                description="Main poster image for the tour (Required, Max 5MB)"
+                description="Main poster image for the tour (Required, Max 100MB)"
                 showPreview={true}
                 error={errors.posterimagefile?.message}
                 required={true}
@@ -399,7 +400,7 @@ export default function TourCreate() {
                 maxSize={100}
                 maxFiles={1}
                 label="V Image"
-                description="Optional V image (Max 5MB)"
+                description="Optional V image (Max 100MB)"
                 showPreview={true}
                 error={errors.vrimagefile?.message}
                 required={false}
@@ -414,7 +415,7 @@ export default function TourCreate() {
                 maxSize={100}
                 maxFiles={10}
                 label="Tour Images"
-                description="Additional tour images (Optional, Max 10 files, 5MB each)"
+                description="Additional tour images (Optional, Max 10 files, 100MB each)"
                 showPreview={true}
                 error={errors.tourimagefiles?.message}
                 required={false}

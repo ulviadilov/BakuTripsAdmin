@@ -4,6 +4,7 @@ import { QUERY_KEYS } from "../../constants/queryKeys";
 import { categoryService } from "../../services/category";
 import { groupTourService } from "../../services/groupTour";
 import { useEffect, useRef } from "react";
+import { paths } from "../../constants/path";
 
 export default function TourDetail() {
     const navigate = useNavigate();
@@ -47,11 +48,11 @@ export default function TourDetail() {
     }, [tour?.vrImagePath]);
 
     const handleBack = () => {
-        navigate("/group-tour");
+        navigate(paths.GROUP_TOUR.LIST);
     };
 
     const handleEdit = () => {
-        navigate(`/group-tour/${id}`);
+        navigate(paths.GROUP_TOUR.EDIT(id));
     };
 
     // Get category name by ID

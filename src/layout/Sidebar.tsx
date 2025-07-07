@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import {
-  Menu,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -9,8 +8,10 @@ import {
   LogOut,
 } from 'lucide-react';
 import classNames from 'classnames';
+import { useQuery } from '@tanstack/react-query';
 import { navItems } from '../constants/path';
 import Logo from '../assets/Logo.png'
+import { authService } from '../services/auth';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -31,6 +32,24 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
 
+  // Fetch user profile using React Query
+  const { data: userProfile, isLoading: isLoadingUser, error } = useQuery({
+    queryKey: ['user-profile'],
+    queryFn: authService.getUser,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+  });
+
+  // Generate initials from user name
+  const getUserInitials = (name: string): string => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   const toggleExpanded = (label: string) => {
     if (isCollapsed) return;
 
@@ -44,18 +63,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   const isItemExpanded = (label: string) => expandedItems.includes(label);
 
   const handleLogout = () => {
-    // Clear token from localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('authToken');
     localStorage.removeItem('accessToken');
-    // Clear any other auth-related items you might have
-    localStorage.removeItem('user');
-    localStorage.removeItem('userData');
 
-    // Close popup
     setShowLogoutPopup(false);
 
-    // Redirect to login
     navigate('/login');
   };
 
@@ -63,7 +76,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     setShowLogoutPopup(!showLogoutPopup);
   };
 
-  // Close popup when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
@@ -79,6 +91,13 @@ const Sidebar: React.FC<SidebarProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showLogoutPopup]);
+
+  // Handle user fetch error
+  useEffect(() => {
+    if (error) {
+      console.error('Failed to fetch user profile:', error);
+    }
+  }, [error]);
 
   const isAnyChildActive = (children: any[]): boolean => {
     if (!children) return false;
@@ -210,7 +229,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  const renderCollapsedDropdown = (children: any[], parentLabel: string) => {
+  const renderCollapsedDropdown = (children: any[], parentLabel: string,index:number) => {
     const renderDropdownItems = (items: any[], level: number = 0) => {
       return items.map((child: any, childIndex: number) => {
         const isChildItemActive = location.pathname === child.path;
@@ -249,7 +268,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     };
 
     return (
-      <div className="fixed bottom-[70px] left-[4.5rem] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] pointer-events-none group-hover:pointer-events-auto">
+      <div className="fixed bottom-[70px] left-[5rem] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] pointer-events-none group-hover:pointer-events-auto"
+        style={{ top: `calc(${index * 56}px + 100px)` }}>
         <div className="bg-white border border-line shadow-xl rounded-lg py-2 min-w-48 max-h-80 overflow-y-auto" style={{
             scrollbarWidth:"none"
         }}>
@@ -338,7 +358,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               </div>
             )}
 
-            {isCollapsed && hasChildren && renderCollapsedDropdown(children, label)}
+            {isCollapsed && hasChildren && renderCollapsedDropdown(children, label,index)}
           </>
         ) : (
           <>
@@ -397,6 +417,33 @@ const Sidebar: React.FC<SidebarProps> = ({
     );
   };
 
+  // Get user display data
+  const getUserDisplayData = () => {
+    if (isLoadingUser) {
+      return {
+        name: 'Loading...',
+        email: 'Loading...',
+        initials: 'L'
+      };
+    }
+
+    if (error || !userProfile) {
+      return {
+        name: 'Admin User',
+        email: 'admin@example.com',
+        initials: 'A'
+      };
+    }
+
+    return {
+      name: userProfile?.data?.firstname || 'User',
+      email: userProfile?.data?.email || 'user@example.com',
+      initials: getUserInitials(userProfile?.data?.firstname || 'User')
+    };
+  };
+
+  const userDisplayData = getUserDisplayData();
+
   return (
     <>
       {isOpen && (
@@ -413,12 +460,11 @@ const Sidebar: React.FC<SidebarProps> = ({
         className={classNames(
           'sticky top-0 z-30 lg:static h-screen bg-gradient-to-b from-backg to-white',
           'border-r border-line shadow-xl lg:shadow-none',
-          'transition-all duration-300 ease-in-out flex-col hidden lg:flex',
+          'transition-all duration-300 ease-in-out flex-col lg:flex',
           {
             'w-81': !isCollapsed,
             'w-21': isCollapsed,
             'translate-x-0': isOpen,
-            '-translate-x-full': !isOpen,
           },
           'lg:translate-x-0'
         )}
@@ -446,7 +492,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               'absolute -right-3 top-8 w-6 h-6 bg-white border-2 border-line',
               'rounded-full flex items-center justify-center shadow-md z-10',
               'hover:bg-backg transition-colors duration-200',
-              'hidden lg:flex'
+
             )}
           >
             {isCollapsed ? (
@@ -454,13 +500,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             ) : (
               <ChevronLeft className="w-3 h-3 text-medium" />
             )}
-          </button>
-
-          <button
-            onClick={onClose}
-            className="absolute top-6 right-6 lg:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-tag transition-colors"
-          >
-            <Menu className="w-5 h-5 text-medium" />
           </button>
         </div>
 
@@ -476,13 +515,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               <button
                 onClick={handleUserClick}
                 className="flex items-center space-x-3 px-4 py-2 w-full hover:bg-tag/30 rounded-lg transition-colors duration-200"
+                disabled={isLoadingUser}
               >
                 <div className="w-8 h-8 bg-gradient-to-br from-alert-green to-alert-blue rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-semibold">A</span>
+                  <span className="text-white text-xs font-semibold">
+                    {userDisplayData.initials}
+                  </span>
                 </div>
                 <div className="flex-1 min-w-0 text-left">
-                  <p className="text-sm font-medium text-dark truncate">Admin User</p>
-                  <p className="text-xs text-medium truncate">admin@example.com</p>
+                  <p className="text-sm font-medium text-dark truncate">
+                    {userDisplayData.name}
+                  </p>
+                  <p className="text-xs text-medium truncate">
+                    {userDisplayData.email}
+                  </p>
                 </div>
                 <ChevronUp className={classNames(
                   "w-4 h-4 text-medium transition-transform duration-200",
@@ -511,13 +557,16 @@ const Sidebar: React.FC<SidebarProps> = ({
               <button
                 onClick={handleUserClick}
                 className="w-8 h-8 bg-gradient-to-br from-alert-green to-alert-blue rounded-full flex items-center justify-center hover:scale-105 transition-transform duration-200"
+                disabled={isLoadingUser}
               >
-                <span className="text-white text-xs font-semibold">A</span>
+                <span className="text-white text-xs font-semibold">
+                  {userDisplayData.initials}
+                </span>
               </button>
 
               {/* Collapsed User Tooltip */}
               <div className="fixed left-[4.5rem] ml-3 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 whitespace-nowrap z-[100] pointer-events-none shadow-lg">
-                Admin User
+                {userDisplayData.name}
                 <div className="absolute right-full top-1/2 -translate-y-1/2 border-[6px] border-transparent border-r-gray-800"></div>
               </div>
 

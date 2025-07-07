@@ -3,6 +3,7 @@ export const paths = {
     PARTNERS: {
         LIST: "/partners",
         CREATE: "/partners/create",
+        EDIT:(id=":id")=>`/partner/${id}`
     },
     CATEGORY: {
         LIST: "/category",

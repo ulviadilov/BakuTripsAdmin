@@ -181,7 +181,7 @@ export default function TourCreate() {
                                 maxSize={100}
                                 maxFiles={1}
                                 label="Poster Image"
-                                description="Main poster image for the tour (Required, Max 5MB)"
+                                description="Main poster image for the tour (Required, Max 100MB)"
                                 showPreview={true}
                                 error={errors.posterImageFile?.message}
                                 required={true}
