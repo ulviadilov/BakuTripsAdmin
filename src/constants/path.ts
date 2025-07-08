@@ -1,5 +1,10 @@
 export const paths = {
     DASHBOARD: "/",
+    SLIDER:{
+        LIST:"/slider",
+        CREATE:"/slider/create",
+        EDIT:(id=":id")=>`/slider/${id}`
+    },
     PARTNERS: {
         LIST: "/partners",
         CREATE: "/partners/create",
@@ -67,6 +72,11 @@ export const paths = {
             EDIT: (id = ":id") => `/social/${id}`,
         },
     },
+    GUIDE:{
+        LIST:"/guide",
+        CREATE:"/guide/create",
+        EDIT:(id=":id")=>`/guide/${id}`
+    },
     AUTH:{
         LOGIN:"/login"
     }
@@ -89,16 +99,20 @@ import {
     User,
     Contact,
     Share2,
-    Calendar
+    Calendar,
+    UserCircle,
+    Sliders
 } from "lucide-react";
 
 export const navItems = [
     { label: "Dashboard", icon: Home, path: paths.DASHBOARD },
+    { label: "Slider", icon:Sliders, path: paths.SLIDER.LIST},
     { label: "Orders", icon: Package, path: "/orders" },
     { label: "Promos", icon: Percent, path: "/promos" },
     { label: "Partners", icon: Building2, path: paths.PARTNERS.LIST },
     { label: "Team Members", icon: Users2, path: "/team-members" },
     { label: "Blogs", icon: Newspaper, path: "/blogs" },
+    { label: "Guide", icon: User,path:paths.GUIDE.LIST},
     {
         label: "Tours",
         icon: Compass,
@@ -165,5 +179,5 @@ export const navItems = [
             },
         ],
     },
-    { label: "User", icon: User, path: paths.USER.LIST },
+    { label: "User", icon: UserCircle, path: paths.USER.LIST },
 ];

@@ -44,6 +44,12 @@ import DailyProgramEdit from "../pages/PackageTour/DailyProgram/DailyProgramEdit
 import LoginPage from "../pages/Login/Login";
 import AuthGuard from "../layout/AuthGuard";
 import EditPartner from "../pages/Partners/EditPartner";
+import GuideList from "../pages/Guide/GuideList";
+import GuideCreate from "../pages/Guide/GuideCreate";
+import GuideEdit from "../pages/Guide/GuideEdit";
+import SliderCreate from "../pages/Slider/SliderCreate";
+import SliderList from "../pages/Slider/SliderList";
+import SliderUpdate from "../pages/Slider/SliderUpdate";
 
 export const router = createBrowserRouter([
     {
@@ -55,8 +61,21 @@ export const router = createBrowserRouter([
         ),
         children: [
             {
+                index:true,
                 path: paths.DASHBOARD,
                 element: <Dashboard />,
+            },
+            {
+                path: paths.SLIDER.LIST,
+                element: <SliderList />,
+            },
+            {
+                path: paths.SLIDER.EDIT(),
+                element: <SliderUpdate />,
+            },
+            {
+                path: paths.SLIDER.CREATE,
+                element: <SliderCreate />,
             },
             {
                 path: paths.PARTNERS.LIST,
@@ -81,6 +100,18 @@ export const router = createBrowserRouter([
             {
                 path: paths.CATEGORY.EDIT(),
                 element: <CategoryEdit />,
+            },
+            {
+                path: paths.GUIDE.LIST,
+                element: <GuideList />,
+            },
+            {
+                path: paths.GUIDE.CREATE,
+                element: <GuideCreate />,
+            },
+            {
+                path: paths.GUIDE.EDIT(),
+                element: <GuideEdit />,
             },
             {
                 path: paths.GROUP_TOUR.LIST,

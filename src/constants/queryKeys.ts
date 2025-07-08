@@ -29,5 +29,11 @@ export const QUERY_KEYS = {
         detail: (id: string) =>
             [...QUERY_KEYS.destination.details(), id] as const,
     },
+    slider:{
+        all:["slider"] as const
+    },
+    guide:{
+        all:["guide"] as const,
+    },
     profile:["profile"] as const
 };
