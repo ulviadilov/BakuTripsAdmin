@@ -44,7 +44,7 @@ export default function PrivatePackageList() {
         });
     }, []);
     const handleCreate = () => {
-        navigate(paths.PRIVATE_PACKAGE.CREATE); // Adjust path as needed
+        navigate(paths.PRIVATE_PACKAGE.CREATE);
     };
 
     const [deleteModal, setDeleteModal] = useState<{
@@ -56,7 +56,7 @@ export default function PrivatePackageList() {
     });
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.privateTour.packages], // Adjust query key as needed
+        queryKey: [QUERY_KEYS.privateTour.packages],
         queryFn: () => privateTourService.getAllPrivatePackages(0, 10),
     });
 
@@ -131,7 +131,7 @@ export default function PrivatePackageList() {
                     creatable={true}
                     searchable={false}
                     createButtonText="Create New Package"
-                    title="Tours"
+                    title="Packages"
                     actions={true}
                     columns={columns}
                     pagination={paginationProps}

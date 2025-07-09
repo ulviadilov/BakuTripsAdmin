@@ -9,6 +9,7 @@ import { QUERY_KEYS } from "../../../constants/queryKeys";
 import type { PrivatePackageFormData } from "../../../services/privateTour/types";
 import Select from "../../../components/Select";
 import Input from "../../../components/Input";
+import { paths } from "../../../constants/path";
 
 
 const schema = yup.object({
@@ -41,13 +42,13 @@ export default function PrivatePackageCreate() {
     const mutation = useMutation({
         mutationFn: privateTourService.createPrivatePackage,
         onSuccess: () => {
-            toast.success('Destination created successfully');
+            toast.success('Package created successfully');
             reset();
-            navigate('/private-package');
+            navigate(paths.PRIVATE_PACKAGE.LIST);
         },
         onError: (error: any) => {
             console.error(error);
-            toast.error(error.response?.data?.message || 'Failed to create destination');
+            toast.error(error.response?.data?.message || 'Failed to create package');
         }
     });
 
@@ -60,7 +61,7 @@ export default function PrivatePackageCreate() {
     };
 
     const handleBack = () => {
-        navigate('/private-package');
+        navigate(paths.PRIVATE_PACKAGE.LIST);
     };
 
     return (
@@ -77,8 +78,8 @@ export default function PrivatePackageCreate() {
                         </svg>
                     </button>
                     <div>
-                        <h1 className="text-2xl font-semibold text-gray-900">Create Destination</h1>
-                        <p className="text-gray-600 text-sm mt-1">Add a new destination</p>
+                        <h1 className="text-2xl font-semibold text-gray-900">Create Package</h1>
+                        <p className="text-gray-600 text-sm mt-1">Add a new Package</p>
                     </div>
                 </div>
             </div>
@@ -142,7 +143,7 @@ export default function PrivatePackageCreate() {
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                     </svg>
-                                    Create Destination
+                                    Create Package
                                 </>
                             )}
                         </button>
