@@ -13,7 +13,7 @@ const schema = yup.object().shape({
     corporateMail: yup.string().email("Invalid email format").required("Corporate email is required"),
     location: yup.string().required("Location is required"),
     workingHours: yup.string().required("Working hours are required"),
-    mapUrl: yup.string().url("Invalid URL format").required("Map URL is required")
+    mapUrl: yup.string().required("Map URL is required")
 })
 
 type FormData = yup.InferType<typeof schema>
@@ -51,7 +51,13 @@ export default function ContactCreate() {
     })
 
     const onSubmit = async (data: FormData) => {
-        mutation.mutate(data)
+        const srcMatch = data.mapUrl.match(/src="([^"]+)"/);
+        const extractedSrc = srcMatch ? srcMatch[1] : '';
+        const payload = {
+            ...data,
+            mapUrl: extractedSrc
+        }
+        mutation.mutate(payload)
     }
 
     const handleBack = () => {
@@ -135,7 +141,7 @@ export default function ContactCreate() {
                         name="mapUrl"
                         control={control}
                         label="Map URL"
-                        type="url"
+                        type="text"
                         placeholder="Enter map URL"
                         required={true}
                         error={errors.mapUrl?.message}

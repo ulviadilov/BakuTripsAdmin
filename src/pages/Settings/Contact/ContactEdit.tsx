@@ -26,7 +26,6 @@ const schema = yup.object().shape({
     workingHours: yup.string().required("Working hours are required"),
     mapUrl: yup
         .string()
-        .url("Invalid URL format")
         .required("Map URL is required"),
 });
 
@@ -92,6 +91,9 @@ export default function ContactEdit() {
     }, [data, reset]);
 
     const onSubmit = async (data: FormData) => {
+        const srcMatch = data.mapUrl.match(/src="([^"]+)"/);
+        const extractedSrc = srcMatch ? srcMatch[1] : '';
+        data.mapUrl = extractedSrc ? extractedSrc : data.mapUrl;
         mutation.mutate(data);
     };
 
@@ -210,7 +212,7 @@ export default function ContactEdit() {
                         name="mapUrl"
                         control={control}
                         label="Map URL"
-                        type="url"
+                        type="text"
                         placeholder="Enter map URL"
                         required={true}
                         error={errors.mapUrl?.message}
