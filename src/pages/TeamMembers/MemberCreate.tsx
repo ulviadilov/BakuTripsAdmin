@@ -17,7 +17,7 @@ const schema = yup.object({
     description: yup.string().required("Description is required"),
     position: yup.string().required("Position is required"),
     posterImage: yup.mixed<File>().required("Poster Image is required"),
-    hoverImage: yup.mixed<File>().required("Hover Image is required"),
+    hoverImage: yup.mixed<File>().required("Funny Image is required"),
 });
 
 const teamOptions = [
@@ -175,7 +175,7 @@ export default function MemberCreate() {
                         multiple={false}
                         maxSize={100}
                         maxFiles={1}
-                        label="Hover Image"
+                        label="Funny Image"
                         description="Drag and drop an image here or click to browse (Max 100MB)"
                         showPreview={true}
                         error={errors.hoverImage?.message}

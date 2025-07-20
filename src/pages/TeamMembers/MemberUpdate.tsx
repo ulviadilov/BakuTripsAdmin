@@ -302,7 +302,7 @@ export default function MemberUpdate() {
                         multiple={false}
                         maxSize={100}
                         maxFiles={1}
-                        label="Update Hover Image"
+                        label="Update Funny Image"
                         description="Drag and drop an image here or click to browse (Max 100MB) - Leave empty to keep current image"
                         showPreview={true}
                         error={errors.hoverImage?.message}
