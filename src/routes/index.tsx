@@ -50,6 +50,9 @@ import GuideEdit from "../pages/Guide/GuideEdit";
 import SliderCreate from "../pages/Slider/SliderCreate";
 import SliderList from "../pages/Slider/SliderList";
 import SliderUpdate from "../pages/Slider/SliderUpdate";
+import MemberList from "../pages/TeamMembers/MemberList";
+import MemberCreate from "../pages/TeamMembers/MemberCreate";
+import MemberUpdate from "../pages/TeamMembers/MemberUpdate";
 
 export const router = createBrowserRouter([
     {
@@ -100,6 +103,18 @@ export const router = createBrowserRouter([
             {
                 path: paths.CATEGORY.EDIT(),
                 element: <CategoryEdit />,
+            },
+            {
+                path:paths.MEMBER.LIST,
+                element:<MemberList/>
+            },
+            {
+                path:paths.MEMBER.CREATE,
+                element:<MemberCreate/>
+            },
+            {
+                path:paths.MEMBER.EDIT(),
+                element:<MemberUpdate/>
             },
             {
                 path: paths.GUIDE.LIST,

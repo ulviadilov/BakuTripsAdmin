@@ -54,6 +54,11 @@ export const paths = {
         EDIT: (id = ":id") => `/destination/${id}`,
         DETAIL: (id = ":id") => `/destination/detail/${id}`,
     },
+    MEMBER:{
+        LIST:"/member",
+        CREATE:"/member/create",
+        EDIT:(id=":id")=>`/member/${id}`
+    },
     USER: {
         LIST: "/user",
         CREATE: "/user/create",
@@ -110,7 +115,7 @@ export const navItems = [
     { label: "Orders", icon: Package, path: "/orders" },
     { label: "Promos", icon: Percent, path: "/promos" },
     { label: "Partners", icon: Building2, path: paths.PARTNERS.LIST },
-    { label: "Team Members", icon: Users2, path: "/team-members" },
+    { label: "Team Members", icon: Users2, path: paths.MEMBER.LIST },
     { label: "Blogs", icon: Newspaper, path: "/blogs" },
     { label: "Guide", icon: User,path:paths.GUIDE.LIST},
     {

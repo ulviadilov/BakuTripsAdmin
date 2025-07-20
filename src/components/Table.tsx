@@ -117,7 +117,7 @@ const TableCell: React.FC<{
 }> = ({ column, value, row }) => {
   const { type = 'text', imageSize = 'medium', fallbackText } = column;
 
-  const shouldTruncate = type === 'text' && typeof value === 'string' && value.length > 150;
+  const shouldTruncate = type === 'text' && typeof value === 'string' && value.length > 100;
   const truncatedText = shouldTruncate ? `${value.substring(0, 60)}...` : value;
 
   switch (type) {

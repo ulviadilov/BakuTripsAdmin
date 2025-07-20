@@ -32,6 +32,9 @@ export const QUERY_KEYS = {
     slider:{
         all:["slider"] as const
     },
+    member:{
+        all:["member"] as const
+    },
     guide:{
         all:["guide"] as const,
     },
