@@ -80,6 +80,9 @@ export default function TourOptionCreate() {
   });
 
   const onSubmit = async (data: PackageTourOption) => {
+    const srcMatch = data.mapurl.match(/src="([^"]+)"/);
+    const extractedSrc = srcMatch ? srcMatch[1] : '';
+    data.mapurl = extractedSrc
     mutation.mutate(data);
   };
 

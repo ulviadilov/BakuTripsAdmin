@@ -12,7 +12,7 @@ import Input from "../../../components/Input";
 import { ArrayInput } from "../../../components/ArrayInput";
 import { FileUpload } from "../../../components/FIleUpload";
 import { packageOptionService } from "../../../services/packageTour/option";
-import type {PackageTourOptionGet } from "../../../types";
+import type { PackageTourOptionGet } from "../../../types";
 import { paths } from "../../../constants/path";
 
 const schema = yup.object({
@@ -122,7 +122,10 @@ export default function TourOptionEdit() {
     // Populate form with existing data
     useEffect(() => {
         if (tourOptionData) {
-              setValue("packageid", tourOptionData.data?.packageOption.packageId || "");
+            setValue(
+                "packageid",
+                tourOptionData.data?.packageOption.packageId || ""
+            );
             setValue(
                 "displayorder",
                 tourOptionData.data?.packageOption.displayOrder?.toString() ||
@@ -191,6 +194,9 @@ export default function TourOptionEdit() {
     });
 
     const onSubmit = async (data: PackageTourOptionGet) => {
+        const srcMatch = data.mapurl.match(/src="([^"]+)"/);
+        const extractedSrc = srcMatch ? srcMatch[1] : "";
+        data.mapurl = extractedSrc ? extractedSrc : data.mapurl;
         mutation.mutate(data);
     };
 

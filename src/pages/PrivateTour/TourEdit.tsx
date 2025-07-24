@@ -152,6 +152,9 @@ export default function TourUpdate() {
     });
 
     const onSubmit = async (data: PrivateFormDataGet) => {
+        const srcMatch = data.googlemapurl.match(/src="([^"]+)"/);
+        const extractedSrc = srcMatch ? srcMatch[1] : "";
+        data.googlemapurl = extractedSrc ? extractedSrc : data.googlemapurl;
         mutation.mutate(data);
     };
 

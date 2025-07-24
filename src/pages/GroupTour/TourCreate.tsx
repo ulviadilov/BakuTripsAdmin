@@ -151,11 +151,13 @@ export default function TourCreate() {
     });
 
     const onSubmit = async (data: TourFormData) => {
+        const srcMatch = data.googleMapUrl.match(/src="([^"]+)"/);
+        const extractedSrc = srcMatch ? srcMatch[1] : '';
         const formData = new FormData();
         formData.append("tourCategoryId", data.tourCategoryId);
         formData.append("order", data.order.toString());
         formData.append("name", data.name);
-        formData.append("googleMapUrl", data.googleMapUrl);
+        formData.append("googleMapUrl", extractedSrc);
         formData.append("duration", data.duration);
         formData.append("isPopular", data.isPopular.toString());
         formData.append("shortDescription", data.shortDescription);
