@@ -152,7 +152,7 @@ export default function TourCreate() {
 
     const onSubmit = async (data: TourFormData) => {
         const srcMatch = data.googleMapUrl.match(/src="([^"]+)"/);
-        const extractedSrc = srcMatch ? srcMatch[1] : '';
+        const extractedSrc = srcMatch ? srcMatch[1] : "";
         const formData = new FormData();
         formData.append("tourCategoryId", data.tourCategoryId);
         formData.append("order", data.order.toString());
@@ -235,7 +235,6 @@ export default function TourCreate() {
 
             <div className="w-full max-w-6xl">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-
                     {/* Basic Information Section */}
                     <div className="bg-white p-6 rounded-lg border border-gray-200">
                         <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -288,7 +287,7 @@ export default function TourCreate() {
                                     name="googleMapUrl"
                                     control={control}
                                     label="Google Map URL"
-                                    type="url"
+                                    type="text"
                                     placeholder="Enter Google Map URL"
                                     required={true}
                                     error={errors.googleMapUrl?.message}

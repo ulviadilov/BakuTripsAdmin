@@ -345,7 +345,7 @@ export default function TourUpdate() {
                                     name="googleMapUrl"
                                     control={control}
                                     label="Google Map URL"
-                                    type="url"
+                                    type="text"
                                     placeholder="Enter Google Map URL"
                                     required={true}
                                     error={errors.googleMapUrl?.message}
