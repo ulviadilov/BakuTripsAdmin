@@ -51,7 +51,8 @@ export default function GuideList() {
 
     const { data, isLoading, isError, refetch } = useQuery({
         queryKey: [QUERY_KEYS.guide.all],
-        queryFn: () => guideService.getAll(paginationData.skip,paginationData.take),
+        queryFn: () =>
+            guideService.getAll(paginationData.skip, paginationData.take),
     });
 
     const [deleteModal, setDeleteModal] = useState<{
@@ -112,14 +113,13 @@ export default function GuideList() {
             </div>
         );
     }
-        const {totalCount,tourGuides} = data?.data
+    const { totalCount, tourGuides } = data?.data;
 
     const paginationProps = {
-        skip:paginationData.skip,
-        take:paginationData.take,
-        totalCount:totalCount
-    }
-
+        skip: paginationData.skip,
+        take: paginationData.take,
+        totalCount: totalCount,
+    };
 
     return (
         <>

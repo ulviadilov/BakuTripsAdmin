@@ -27,7 +27,6 @@ const schema = yup.object({
         .min(2, "Name must be at least 2 characters"),
     googlemapurl: yup
         .string()
-        .url("Must be a valid URL")
         .required("Google Map URL is required"),
     duration: yup.string().required("Duration is required"),
     ispopular: yup.boolean().required("Popular status is required"),

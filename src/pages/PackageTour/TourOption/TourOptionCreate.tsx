@@ -18,7 +18,7 @@ const schema = yup.object({
   packageid: yup.string().required("Package Id is required"),
   displayorder: yup.string().required("Order is required").min(0, "Order must be at least 0"),
   optionname: yup.string().required("Tour name is required").min(2, "Name must be at least 2 characters"),
-  mapurl: yup.string().url("Must be a valid URL").required("Google Map URL is required"),
+  mapurl: yup.string().required("Google Map URL is required"),
   shortdescription: yup.string().required("Short description is required").min(10, "Short description must be at least 10 characters"),
   apartmentinfo: yup.string().required("Apartment info is required"),
   roominfo: yup.string().required("Room info is required"),
