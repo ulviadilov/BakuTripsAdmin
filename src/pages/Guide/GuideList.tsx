@@ -50,7 +50,7 @@ export default function GuideList() {
     };
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.guide.all],
+        queryKey: [QUERY_KEYS.guide.all,paginationData.skip,paginationData.take],
         queryFn: () =>
             guideService.getAll(paginationData.skip, paginationData.take),
     });
