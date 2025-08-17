@@ -9,32 +9,45 @@ import { ErrorMessage } from "../../components/Error";
 import toast from "react-hot-toast";
 import type { RowType } from "../../types";
 import Spinner from "../../components/Spinner";
-import { guideService } from "../../services/guide";
+import { promoService } from "../../services/promo";
+import type { PromoCodeRespone } from "../../services/promo/types";
 
 const columns = [
     {
-        key: "language",
-        label: "Language",
+        key: "code",
+        label: "Promo Code",
         type: "text" as const,
     },
     {
-        key: "price",
-        label: "Price",
+        key: "discountPercent",
+        label: "Discount Percentage",
+        type: "text" as const,
+    },
+    {
+        key: "isActive",
+        label: "Status",
+        type: "text" as const,
+    },
+    {
+        key: "maxUsageCount",
+        label: "Maximum Usage Count",
+        type: "text" as const,
+    },
+    {
+        key: "minOrderAmount",
+        label: "Minimum Order Amount",
+        type: "text" as const,
+    },
+    {
+        key: "maxDiscountAmount",
+        label: "Maximum Discount Amount",
         type: "text" as const,
     },
 ];
 
-export default function GuideList() {
+export default function PromoCodeList() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-
-    const handleDelete = (row: any) => {
-        setDeleteModal({
-            isOpen: true,
-            name: row,
-        });
-    };
-
     const [paginationData, setPaginationData] = useState({
         skip: 0,
         take: 10,
@@ -45,16 +58,21 @@ export default function GuideList() {
             take: take || 10,
         });
     }, []);
+    const handleDelete = (row: any) => {
+        setDeleteModal({
+            isOpen: true,
+            name: row,
+        });
+    };
     const handleCreate = () => {
-        navigate(paths.GUIDE.CREATE);
+        navigate(paths.PROMO_CODES.CREATE);
     };
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.guide.all,paginationData.skip,paginationData.take],
+        queryKey: [QUERY_KEYS.promoCode.all],
         queryFn: () =>
-            guideService.getAll(paginationData.skip, paginationData.take),
+            promoService.getAll(paginationData.skip, paginationData.take),
     });
-
     const [deleteModal, setDeleteModal] = useState<{
         isOpen: boolean;
         name: any;
@@ -80,28 +98,28 @@ export default function GuideList() {
     };
 
     const deleteMutation = useMutation({
-        mutationFn: (id: string) => guideService.deleteById(id),
+        mutationFn: (id: string) => promoService.deletePromoCode(id),
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: [QUERY_KEYS.guide.all],
+                queryKey: [QUERY_KEYS.promoCode.all],
             });
             setDeleteModal({ isOpen: false, name: null });
-            toast.success("Guide deleted successfully");
+            toast.success("Promo code deleted successfully");
         },
         onError: (error) => {
-            toast.error("Failed to delete guide");
-            console.error("Failed to delete guide:", error);
+            toast.error("Failed to delete promo code");
+            console.error("Failed to delete promo code:", error);
         },
     });
 
     const handleEdit = (row: RowType) => {
-        navigate(paths.GUIDE.EDIT(row.id));
+        navigate(paths.PROMO_CODES.EDIT(row.id));
     };
 
     if (isLoading) {
         return (
             <div className="p-6 bg-gray-50 min-h-screen">
-                <Spinner message="Loading Guides..." />
+                <Spinner message="Loading Promo codes..." />
             </div>
         );
     }
@@ -113,7 +131,24 @@ export default function GuideList() {
             </div>
         );
     }
-    const { totalCount, tourGuides } = data?.data;
+
+    const promoCodes = data?.data?.promoCodes || [];
+    const totalCount = data?.data?.totalCount || 0;
+
+    const updatedPromo = promoCodes.map(
+        (promoCode: PromoCodeRespone["promoCodes"][number]) => ({
+            ...promoCode,
+            isActive: promoCode.isActive ? (
+                <span className="bg-green-500 py-1 px-2.5 rounded-3xl text-white">
+                    Active
+                </span>
+            ) : (
+                <span className="bg-red-500 py-1 px-2.5 rounded-3xl text-white">
+                    Inactive
+                </span>
+            ),
+        })
+    );
 
     const paginationProps = {
         skip: paginationData.skip,
@@ -125,15 +160,15 @@ export default function GuideList() {
         <>
             <div className="p-6 bg-gray-50 min-h-screen">
                 <Table
-                    data={tourGuides}
+                    data={updatedPromo}
                     creatable={true}
                     searchable={false}
-                    createButtonText="Create New Guide"
-                    title="Guides"
+                    createButtonText="Create New Promo Code"
+                    title="Promo Codes"
+                    onPageChange={handlePageChange}
                     actions={true}
                     columns={columns}
                     pagination={paginationProps}
-                    onPageChange={handlePageChange}
                     onCreate={handleCreate}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
@@ -143,9 +178,9 @@ export default function GuideList() {
                 isOpen={deleteModal.isOpen}
                 onClose={handleCloseModal}
                 onConfirm={handleConfirmDelete}
-                name={deleteModal.name?.language || ""}
+                name={deleteModal.name?.code || ""}
                 isDeleting={deleteMutation.isPending}
-                type="guide"
+                type="Promo Code"
             />
         </>
     );

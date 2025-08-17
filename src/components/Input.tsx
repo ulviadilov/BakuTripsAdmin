@@ -8,6 +8,7 @@ export default function Input({
     placeholder,
     required = false,
     error,
+    mask,
     ...props
 }: {
     name: string,
@@ -17,6 +18,7 @@ export default function Input({
     placeholder?: string,
     required?: boolean,
     error?: string,
+    mask?: string,
 }) {
     return (
         <div className="mb-4">
@@ -31,9 +33,10 @@ export default function Input({
                         ref={ref}
                         name={fieldName}
                         type={type}
-                        value={value || ''} // Ensure controlled component with fallback
+                        value={value ?? ''} // Ensure controlled component with fallback
                         onChange={onChange}
                         onBlur={onBlur}
+                        autoFocus={type === "text"}
                         placeholder={placeholder}
                         className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ${
                             error

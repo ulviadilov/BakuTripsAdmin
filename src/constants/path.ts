@@ -1,14 +1,14 @@
 export const paths = {
     DASHBOARD: "/",
-    SLIDER:{
-        LIST:"/slider",
-        CREATE:"/slider/create",
-        EDIT:(id=":id")=>`/slider/${id}`
+    SLIDER: {
+        LIST: "/slider",
+        CREATE: "/slider/create",
+        EDIT: (id = ":id") => `/slider/${id}`,
     },
     PARTNERS: {
         LIST: "/partners",
         CREATE: "/partners/create",
-        EDIT:(id=":id")=>`/partner/${id}`
+        EDIT: (id = ":id") => `/partner/${id}`,
     },
     CATEGORY: {
         LIST: "/category",
@@ -19,34 +19,34 @@ export const paths = {
         LIST: "/group-tour",
         CREATE: "/group-tour/create",
         EDIT: (id = ":id") => `/group-tour/${id}`,
-        DETAIL:(id = ":id")=> `/group-tour/detail/${id}`
+        DETAIL: (id = ":id") => `/group-tour/detail/${id}`,
     },
     PRIVATE_TOUR: {
         LIST: "/private-tour",
         CREATE: "/private-tour/create",
         EDIT: (id = ":id") => `/private-tour/${id}`,
-        DETAIL:(id = ":id")=> `/private-tour/detail/${id}`
+        DETAIL: (id = ":id") => `/private-tour/detail/${id}`,
     },
-    PRIVATE_PACKAGE:{
-        LIST:"/private-package",
-        CREATE:"/private-package/create",
-        EDIT:(id=":id")=>`/private-package/${id}`
+    PRIVATE_PACKAGE: {
+        LIST: "/private-package",
+        CREATE: "/private-package/create",
+        EDIT: (id = ":id") => `/private-package/${id}`,
     },
     PACKAGE_TOUR_PACKAGE: {
         LIST: "/package-tour-package",
         CREATE: "/package-tour-package/create",
-        EDIT:(id=":id")=>`/package-tour-package/${id}`
+        EDIT: (id = ":id") => `/package-tour-package/${id}`,
     },
-    PACKAGE_TOUR_OPTION:{
-        LIST:"/package-tour-option",
-        CREATE:"/package-tour-option/create",
-        EDIT:(id=":id")=>`/package-tour-option/${id}`,
-        DETAIL:(id=":id")=>`/package-tour-option/detail/${id}`
+    PACKAGE_TOUR_OPTION: {
+        LIST: "/package-tour-option",
+        CREATE: "/package-tour-option/create",
+        EDIT: (id = ":id") => `/package-tour-option/${id}`,
+        DETAIL: (id = ":id") => `/package-tour-option/detail/${id}`,
     },
-    PACKAGE_DAILY_PROGRAM:{
-        LIST:"/package-daily-program",
-        CREATE:"/package-daily-program/create",
-        EDIT:(id=":id")=>`/package-daily-program/${id}`
+    PACKAGE_DAILY_PROGRAM: {
+        LIST: "/package-daily-program",
+        CREATE: "/package-daily-program/create",
+        EDIT: (id = ":id") => `/package-daily-program/${id}`,
     },
     DESTINATION: {
         LIST: "/destination",
@@ -54,10 +54,10 @@ export const paths = {
         EDIT: (id = ":id") => `/destination/${id}`,
         DETAIL: (id = ":id") => `/destination/detail/${id}`,
     },
-    MEMBER:{
-        LIST:"/member",
-        CREATE:"/member/create",
-        EDIT:(id=":id")=>`/member/${id}`
+    MEMBER: {
+        LIST: "/member",
+        CREATE: "/member/create",
+        EDIT: (id = ":id") => `/member/${id}`,
     },
     USER: {
         LIST: "/user",
@@ -69,7 +69,7 @@ export const paths = {
             LIST: "/contact",
             CREATE: "/contact/create",
             EDIT: (id = ":id") => `/contact/${id}`,
-            DETAIL:(id=":id")=>`/contact/detail/${id}`
+            DETAIL: (id = ":id") => `/contact/detail/${id}`,
         },
         SOCIAL: {
             LIST: "/social",
@@ -77,14 +77,19 @@ export const paths = {
             EDIT: (id = ":id") => `/social/${id}`,
         },
     },
-    GUIDE:{
-        LIST:"/guide",
-        CREATE:"/guide/create",
-        EDIT:(id=":id")=>`/guide/${id}`
+    GUIDE: {
+        LIST: "/guide",
+        CREATE: "/guide/create",
+        EDIT: (id = ":id") => `/guide/${id}`,
     },
-    AUTH:{
-        LOGIN:"/login"
-    }
+    PROMO_CODES: {
+        LIST: "/promo-codes",
+        CREATE: "/promo-codes/create",
+        EDIT: (id = ":id") => `/promo-codes/${id}`,
+    },
+    AUTH: {
+        LOGIN: "/login",
+    },
 };
 
 import {
@@ -106,18 +111,18 @@ import {
     Share2,
     Calendar,
     UserCircle,
-    Sliders
+    Sliders,
 } from "lucide-react";
 
 export const navItems = [
     { label: "Dashboard", icon: Home, path: paths.DASHBOARD },
-    { label: "Slider", icon:Sliders, path: paths.SLIDER.LIST},
+    { label: "Slider", icon: Sliders, path: paths.SLIDER.LIST },
     { label: "Orders", icon: Package, path: "/orders" },
-    { label: "Promos", icon: Percent, path: "/promos" },
+    { label: "Promo Codes", icon: Percent, path: paths.PROMO_CODES.LIST },
     { label: "Partners", icon: Building2, path: paths.PARTNERS.LIST },
     { label: "Team Members", icon: Users2, path: paths.MEMBER.LIST },
     { label: "Blogs", icon: Newspaper, path: "/blogs" },
-    { label: "Guide", icon: User,path:paths.GUIDE.LIST},
+    { label: "Guide", icon: User, path: paths.GUIDE.LIST },
     {
         label: "Tours",
         icon: Compass,
@@ -130,18 +135,18 @@ export const navItems = [
             {
                 label: "Private Tours",
                 icon: Folder,
-                children:[
+                children: [
                     {
-                        label:"Packages",
-                        icon:Package,
-                        path:paths.PRIVATE_PACKAGE.LIST
+                        label: "Packages",
+                        icon: Package,
+                        path: paths.PRIVATE_PACKAGE.LIST,
                     },
                     {
-                        label:"Tours",
-                        icon:Compass,
-                        path:paths.PRIVATE_TOUR.LIST
-                    }
-                ]
+                        label: "Tours",
+                        icon: Compass,
+                        path: paths.PRIVATE_TOUR.LIST,
+                    },
+                ],
             },
             {
                 label: "Package Tours",
@@ -159,7 +164,7 @@ export const navItems = [
                     },
                     {
                         label: "Daily Program",
-                        icon: Calendar ,
+                        icon: Calendar,
                         path: paths.PACKAGE_DAILY_PROGRAM.LIST,
                     },
                 ],

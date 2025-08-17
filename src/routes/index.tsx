@@ -53,6 +53,9 @@ import SliderUpdate from "../pages/Slider/SliderUpdate";
 import MemberList from "../pages/TeamMembers/MemberList";
 import MemberCreate from "../pages/TeamMembers/MemberCreate";
 import MemberUpdate from "../pages/TeamMembers/MemberUpdate";
+import PromoCodeList from "../pages/PromoCode/PromoCodeList";
+import PromoCodeCreate from "../pages/PromoCode/PromoCodeCreate";
+import PromoCodeUpdate from "../pages/PromoCode/PromoCodeUpdate";
 
 export const router = createBrowserRouter([
     {
@@ -64,7 +67,7 @@ export const router = createBrowserRouter([
         ),
         children: [
             {
-                index:true,
+                index: true,
                 path: paths.DASHBOARD,
                 element: <Dashboard />,
             },
@@ -105,16 +108,16 @@ export const router = createBrowserRouter([
                 element: <CategoryEdit />,
             },
             {
-                path:paths.MEMBER.LIST,
-                element:<MemberList/>
+                path: paths.MEMBER.LIST,
+                element: <MemberList />,
             },
             {
-                path:paths.MEMBER.CREATE,
-                element:<MemberCreate/>
+                path: paths.MEMBER.CREATE,
+                element: <MemberCreate />,
             },
             {
-                path:paths.MEMBER.EDIT(),
-                element:<MemberUpdate/>
+                path: paths.MEMBER.EDIT(),
+                element: <MemberUpdate />,
             },
             {
                 path: paths.GUIDE.LIST,
@@ -248,6 +251,18 @@ export const router = createBrowserRouter([
                 path: paths.SETTING.CONTACT.EDIT(),
                 element: <ContactEdit />,
             },
+            {
+                path: paths.PROMO_CODES.LIST,
+                element: <PromoCodeList />,
+            },
+            {
+                path: paths.PROMO_CODES.CREATE,
+                element: <PromoCodeCreate />,
+            },
+            {
+                path: paths.PROMO_CODES.EDIT(),
+                element: <PromoCodeUpdate />,
+            },
         ],
     },
     {
@@ -255,11 +270,11 @@ export const router = createBrowserRouter([
         element: <LoginPage />,
     },
     {
-        path:"*",
-        element:(
+        path: "*",
+        element: (
             <AuthGuard>
-                <MainLayout/>
+                <MainLayout />
             </AuthGuard>
-        )
-    }
+        ),
+    },
 ]);

@@ -4,8 +4,8 @@ export const QUERY_KEYS = {
     contact: "contact",
     groupTour: "groupTour",
     package: "package",
-    partner:{
-        all:["partner"] as const,
+    partner: {
+        all: ["partner"] as const,
     },
     tour: {
         all: ["tour"] as const,
@@ -29,14 +29,17 @@ export const QUERY_KEYS = {
         detail: (id: string) =>
             [...QUERY_KEYS.destination.details(), id] as const,
     },
-    slider:{
-        all:["slider"] as const
+    promoCode: {
+        all: ["promo-code"] as const,
     },
-    member:{
-        all:["member"] as const
+    slider: {
+        all: ["slider"] as const,
     },
-    guide:{
-        all:["guide"] as const,
+    member: {
+        all: ["member"] as const,
     },
-    profile:["profile"] as const
+    guide: {
+        all: ["guide"] as const,
+    },
+    profile: ["profile"] as const,
 };
