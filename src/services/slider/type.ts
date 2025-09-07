@@ -3,6 +3,7 @@ export interface SliderType {
     title: string;
     subTitle: string;
     backgroundImage: File;
+    translations:{languageCode:string,title:string,subTitle:string}[]
 }
 
 export type SliderUpdateType = Omit<SliderType, "backgroundImage"> & {
