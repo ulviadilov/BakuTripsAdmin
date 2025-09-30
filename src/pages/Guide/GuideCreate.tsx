@@ -1,22 +1,38 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import * as yup from "yup";
 import Input from "../../components/Input";
 import { paths } from "../../constants/path";
 import { guideService } from "../../services/guide";
+import { useState } from "react";
+import { otherLanguages } from "../../constants";
 
-interface DestinationFormData {
-    language:string;
-    price:string;
+interface GuideFormData {
+    language: string;
+    price: string;
+    translations: Array<{
+        languageCode: string;
+        language: string;
+    }>;
 }
 
 const schema = yup.object({
     language: yup.string().required("Language is required"),
     price: yup.string().required("Price is required"),
-
+    translations: yup
+        .array()
+        .of(
+            yup
+                .object({
+                    languageCode: yup.string().required(),
+                    language: yup.string().required("Language is required"),
+                })
+                .required()
+        )
+        .required(),
 });
 
 export default function GuideCreate() {
@@ -27,13 +43,20 @@ export default function GuideCreate() {
         handleSubmit,
         reset,
         formState: { errors }
-    } = useForm<DestinationFormData>({
+    } = useForm<GuideFormData>({
         resolver: yupResolver(schema),
         defaultValues: {
-            language:"",
-            price:"",
+            language: "",
+            price: "",
+            translations: otherLanguages.map((lang) => ({
+                languageCode: lang.code,
+                language: "",
+            })),
         }
     });
+
+    const { fields } = useFieldArray({ control, name: "translations" });
+    const [activeLang, setActiveLang] = useState(otherLanguages[0]?.code ?? "");
 
     const mutation = useMutation({
         mutationFn: guideService.createGuide,
@@ -48,7 +71,7 @@ export default function GuideCreate() {
         }
     });
 
-    const onSubmit = async (data: DestinationFormData) => {
+    const onSubmit = async (data: GuideFormData) => {
         const formData = {
             ...data,
             price: data.price ? parseFloat(data.price) : 0,
@@ -89,7 +112,7 @@ export default function GuideCreate() {
                         <Input
                             name="language"
                             control={control}
-                            label="Language"
+                            label="Language (English)"
                             type="text"
                             placeholder="Enter Language"
                             required={true}
@@ -107,6 +130,50 @@ export default function GuideCreate() {
                         />
 
                     </div>
+
+                    {otherLanguages.length > 0 && (
+                        <div className="pt-4 border-t border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code
+                                                ? "border-slate-500 text-slate-600"
+                                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {fields.map((field, index) => (
+                                    <div
+                                        key={field.id}
+                                        style={{ display: activeLang === field.languageCode ? "block" : "none" }}
+                                    >
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <Input
+                                                name={`translations.${index}.language`}
+                                                control={control}
+                                                label="Language"
+                                                type="text"
+                                                placeholder="Enter Language"
+                                                required={true}
+                                                error={errors.translations?.[index]?.language?.message}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
 
                     <div className="pt-4 flex items-center space-x-3">

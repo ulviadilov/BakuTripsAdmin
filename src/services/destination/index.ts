@@ -15,6 +15,16 @@ const create = async (destinationData:RequestDestination) => {
             formData.append('imageFile', destinationData.imageFile);
         }
 
+        // Append capital Translations if provided
+        if (destinationData.Translations && Array.isArray(destinationData.Translations)) {
+            destinationData.Translations.forEach((t, i) => {
+                formData.append(`Translations[${i}].languageCode`, t.languageCode);
+                formData.append(`Translations[${i}].name`, t.name || "");
+                formData.append(`Translations[${i}].duration`, t.duration || "");
+                formData.append(`Translations[${i}].description`, t.description || "");
+            });
+        }
+
         // Make API call with FormData
         const response = await apiClient.post('/Destinations/create-destination', formData, {
             headers: {
@@ -41,7 +51,7 @@ const getAll = async (page:number,size:number) => {
 
 const getById = async (id:string) => {
     try {
-        const response = await apiClient.get(`/Destinations/${id}`);
+        const response = await apiClient.get(`/Destinations/${id}?includeAllTranslations=true`);
         return response.data;
     } catch (error) {
         console.error('Error fetching destination:', error);
@@ -63,6 +73,16 @@ const update = async (id:string, destinationData:RequestDestination) => {
             formData.append('imageFile', destinationData.imageFile);
         }else{
             formData.append('imageFile', "")
+        }
+
+        // Append capital Translations if provided
+        if (destinationData.Translations && Array.isArray(destinationData.Translations)) {
+            destinationData.Translations.forEach((t, i) => {
+                formData.append(`Translations[${i}].languageCode`, t.languageCode);
+                formData.append(`Translations[${i}].name`, t.name || "");
+                formData.append(`Translations[${i}].duration`, t.duration || "");
+                formData.append(`Translations[${i}].description`, t.description || "");
+            });
         }
 
         const response = await apiClient.put(`/destinations/${id}`, formData, {

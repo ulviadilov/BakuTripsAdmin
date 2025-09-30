@@ -1,11 +1,13 @@
 import * as yup from 'yup'
-import { useForm } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useNavigate } from 'react-router'
 import { useMutation } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import Input from '../../../components/Input'
 import { contactService } from '../../../services/settings/contact'
+import { otherLanguages } from '../../../constants'
+import { useState } from 'react'
 
 const schema = yup.object().shape({
     displayOrder: yup.number().required("Display order is required").min(0, "Display order must be 0 or greater"),
@@ -17,6 +19,7 @@ const schema = yup.object().shape({
 })
 
 type FormData = yup.InferType<typeof schema>
+type TranslationItem = { languageCode: string; location: string; workingHours: string }
 
 export default function ContactCreate() {
     const navigate = useNavigate()
@@ -38,6 +41,13 @@ export default function ContactCreate() {
         }
     })
 
+    const { fields: translationFields, append } = useFieldArray({ name: 'translations' as any, control: control as any })
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || 'az')
+    // Seed translations (not in schema type, but we pass along)
+    if (translationFields.length === 0 && otherLanguages.length > 0) {
+        otherLanguages.forEach(l => append({ languageCode: l.code, location: '', workingHours: '' } as unknown as TranslationItem))
+    }
+
     const mutation = useMutation({
         mutationFn: contactService.create,
         onSuccess: () => {
@@ -55,7 +65,12 @@ export default function ContactCreate() {
         const extractedSrc = srcMatch ? srcMatch[1] : '';
         const payload = {
             ...data,
-            mapUrl: extractedSrc
+            mapUrl: extractedSrc,
+            translations: (translationFields as any[]).map((_: any, idx: number) => ({
+                languageCode: otherLanguages[idx]?.code,
+                location: (control._formValues as any)?.translations?.[idx]?.location || '',
+                workingHours: (control._formValues as any)?.translations?.[idx]?.workingHours || ''
+            }))
         }
         mutation.mutate(payload)
     }
@@ -146,6 +161,37 @@ export default function ContactCreate() {
                         required={true}
                         error={errors.mapUrl?.message}
                     />
+
+                    {/* Translations Section */}
+                    {otherLanguages.length > 0 && (
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {otherLanguages.map((lang, idx) => (
+                                    <div key={lang.code} style={{ display: activeLang === lang.code ? 'block' : 'none' }}>
+                                        <Input name={`translations.${idx}.location`} control={control as any} label={`Location (${lang.code.toUpperCase()})`} type="text" placeholder="Enter location" />
+                                        <div className="mt-4" />
+                                        <Input name={`translations.${idx}.workingHours`} control={control as any} label={`Working Hours (${lang.code.toUpperCase()})`} type="text" placeholder="Enter working hours" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

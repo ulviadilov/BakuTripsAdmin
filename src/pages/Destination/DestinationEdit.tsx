@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router";
 import * as yup from "yup";
@@ -10,8 +10,10 @@ import { FileUpload } from "../../components/FIleUpload";
 import Select from "../../components/Select";
 import { QUERY_KEYS } from "../../constants/queryKeys";
 import { tourService } from "../../services/tours";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { paths } from "../../constants/path";
+import { otherLanguages } from "../../constants";
+import type { DestinationTranslation } from "../../services/destination/types";
 
 interface DestinationFormData {
     tourId: string;
@@ -20,6 +22,7 @@ interface DestinationFormData {
     duration: string;
     description: string;
     imageFile?: File | undefined;
+    Translations?: DestinationTranslation[];
 }
 
 const schema = yup.object({
@@ -58,9 +61,13 @@ export default function DestinationEdit() {
             name: '',
             duration: '',
             description: '',
-            imageFile: undefined
+            imageFile: undefined,
+            Translations: otherLanguages.map(l => ({ languageCode: l.code, name: '', duration: '', description: '' }))
         }
     });
+
+    const { fields: translationFields, replace: replaceTranslations } = useFieldArray({ control, name: 'Translations' });
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || 'az');
 
     useEffect(() => {
         if (destinationData?.destination) {
@@ -71,8 +78,17 @@ export default function DestinationEdit() {
                 name: destination.name || '',
                 duration: destination.duration || '',
                 description: destination.description || '',
-                imageFile: undefined // File uploads typically reset to undefined
+                imageFile: undefined, // File uploads typically reset to undefined
+                Translations: otherLanguages.map((l) => {
+                    const found = (destination.translations || destination.Translations || []).find((t: DestinationTranslation) => t.languageCode?.toLowerCase() === l.code.toLowerCase());
+                    return found || { languageCode: l.code, name: '', duration: '', description: '' };
+                })
             });
+            const mapped = otherLanguages.map((l) => {
+                const found = (destination.translations || destination.Translations || []).find((t: DestinationTranslation) => t.languageCode?.toLowerCase() === l.code.toLowerCase());
+                return found || { languageCode: l.code, name: '', duration: '', description: '' };
+            });
+            replaceTranslations(mapped);
         }
     }, [destinationData, reset]);
 
@@ -91,7 +107,13 @@ export default function DestinationEdit() {
     const onSubmit = async (data: DestinationFormData) => {
         const formData = {
             ...data,
-            displayOrder: data.displayOrder
+            displayOrder: data.displayOrder,
+            Translations: (data.Translations || []).map(t => ({
+                languageCode: t.languageCode,
+                name: t.name,
+                duration: t.duration,
+                description: t.description,
+            }))
         };
         mutation.mutate(formData);
     };
@@ -250,6 +272,44 @@ export default function DestinationEdit() {
 
 
                     />
+
+                    {/* Translations Section */}
+                    {otherLanguages.length > 0 && (
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {translationFields.map((field, idx) => (
+                                    <div key={field.id} style={{ display: activeLang === otherLanguages[idx]?.code ? 'block' : 'none' }}>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <Input name={`Translations.${idx}.name`} control={control} label={`Name (${otherLanguages[idx]?.code.toUpperCase()})`} type="text" placeholder="Enter name" />
+                                            <Input name={`Translations.${idx}.duration`} control={control} label={`Duration (${otherLanguages[idx]?.code.toUpperCase()})`} type="text" placeholder="Enter duration" />
+                                        </div>
+                                        <div className="space-y-2 mt-4">
+                                            <label className="block text-sm font-medium text-gray-700">Description ({otherLanguages[idx]?.code.toUpperCase()})</label>
+                                            <Controller name={`Translations.${idx}.description`} control={control} render={({ field }) => (
+                                                <textarea {...field} rows={4} placeholder="Enter description" className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500" />
+                                            )} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

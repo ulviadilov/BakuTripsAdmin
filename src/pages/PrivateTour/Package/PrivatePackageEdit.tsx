@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router";
 import * as yup from "yup";
@@ -9,7 +9,8 @@ import { QUERY_KEYS } from "../../../constants/queryKeys";
 import type { PrivatePackageFormData } from "../../../services/privateTour/types";
 import Select from "../../../components/Select";
 import Input from "../../../components/Input";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { otherLanguages } from "../../../constants";
 
 const schema = yup.object({
     tourid: yup.string().required("Tour Id is required"),
@@ -43,15 +44,31 @@ export default function PrivatePackageEdit() {
             tourid: '',
             vehicleinfo: '',
             price: "",
+            translations: otherLanguages.map((l) => ({ languageCode: l.code, vehicleinfo: "" })),
         }
     });
 
+    const { fields } = useFieldArray({ control, name: "translations" });
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || "az");
+
     useEffect(() => {
         if (packageData?.data) {
+            const serverTranslations = packageData.data?.translations || packageData.data?.privateTourPackage?.translations || [];
+            const translationsByLang: Record<string, string> = {};
+            serverTranslations.forEach((tr: any) => {
+                if (tr.languageCode && tr.vehicleinfo !== undefined) {
+                    translationsByLang[tr.languageCode] = tr.vehicleinfo;
+                }
+            });
+
             reset({
                 tourid: packageData.data?.privateTourPackage.tourId || '',
                 vehicleinfo: packageData.data?.privateTourPackage.vehicleInfo || '',
                 price: packageData.data.privateTourPackage.price?.toString() || '',
+                translations: otherLanguages.map((l) => ({
+                    languageCode: l.code,
+                    vehicleinfo: translationsByLang[l.code] ?? "",
+                })),
             });
         }
     }, [packageData, reset]);
@@ -70,7 +87,7 @@ export default function PrivatePackageEdit() {
     });
 
     const onSubmit = async (data: PrivatePackageFormData) => {
-        const formData = {
+        const formData: PrivatePackageFormData = {
             ...data,
             price: data.price
         };
@@ -164,6 +181,41 @@ export default function PrivatePackageEdit() {
                             error={errors.price?.message}
                         />
                     </div>
+
+                    {/* Translations Tabs at bottom (only vehicleinfo) */}
+                    {otherLanguages.length > 0 && (
+                        <div className="pt-4 border-t border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {fields.map((field, index) => (
+                                    <div key={field.id} style={{ display: activeLang === field.languageCode ? 'block' : 'none' }}>
+                                        <Input
+                                            name={`translations.${index}.vehicleinfo`}
+                                            control={control}
+                                            label={`Vehicle Info (${field.languageCode.toUpperCase()})`}
+                                            type="text"
+                                            placeholder="Enter vehicle info"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

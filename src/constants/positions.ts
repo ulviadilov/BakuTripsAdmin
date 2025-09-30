@@ -1,0 +1,32 @@
+export const positionOptions = {
+    en: [
+        { key: "ceo", value: "Chief Executive Officer" },
+        { key: "cto", value: "Chief Technology Officer" },
+        { key: "manager", value: "Manager" },
+        { key: "guide", value: "Tour Guide" },
+        { key: "driver", value: "Driver" },
+        { key: "support", value: "Support Specialist" },
+        { key: "sales", value: "Sales Representative" },
+        { key: "marketing", value: "Marketing Specialist" },
+    ],
+    az: [
+        { key: "ceo", value: "Baş icraçı direktor" },
+        { key: "cto", value: "Texnologiyalar üzrə direktor" },
+        { key: "manager", value: "Menecer" },
+        { key: "guide", value: "Bələdçi" },
+        { key: "driver", value: "Sürücü" },
+        { key: "support", value: "Dəstək mütəxəssisi" },
+        { key: "sales", value: "Satış nümayəndəsi" },
+        { key: "marketing", value: "Marketinq mütəxəssisi" },
+    ],
+    ru: [
+        { key: "ceo", value: "Генеральный директор" },
+        { key: "cto", value: "Технический директор" },
+        { key: "manager", value: "Менеджер" },
+        { key: "guide", value: "Гид" },
+        { key: "driver", value: "Водитель" },
+        { key: "support", value: "Специалист поддержки" },
+        { key: "sales", value: "Менеджер по продажам" },
+        { key: "marketing", value: "Маркетолог" },
+    ],
+};

@@ -1,17 +1,28 @@
 import * as yup from 'yup'
-import { useForm } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useNavigate } from 'react-router'
 import Input from '../../components/Input'
 import { useMutation } from '@tanstack/react-query'
 import { categoryService } from '../../services/category'
 import toast from 'react-hot-toast'
+import { otherLanguages } from '../../constants'
+import { useState } from 'react'
 
-const schema = yup.object().shape({
-    name: yup.string().required("Category is required")
+const schema: yup.ObjectSchema<FormData> = yup.object({
+    name: yup.string().required("Category is required"),
+    Translations: yup.array().of(
+        yup.object({
+            languageCode: yup.string().required(),
+            name: yup.string().required()
+        })
+    ).optional()
 })
 
-type FormData = yup.InferType<typeof schema>
+type FormData = {
+    name: string;
+    Translations?: { languageCode: string; name: string }[];
+}
 
 export default function CategoryCreate() {
     const navigate = useNavigate()
@@ -22,8 +33,14 @@ export default function CategoryCreate() {
         reset,
         formState: { errors }
     } = useForm<FormData>({
-        resolver: yupResolver(schema)
+        resolver: yupResolver(schema),
+        defaultValues: {
+            Translations: otherLanguages.map(l => ({ languageCode: l.code, name: '' }))
+        }
     })
+
+    const { fields: translationFields } = useFieldArray({ control, name: 'Translations' })
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || 'az')
 
     const mutation = useMutation({
         mutationFn: categoryService.create,
@@ -37,7 +54,12 @@ export default function CategoryCreate() {
     })
 
     const onSubmit = async (data: FormData) => {
-        mutation.mutate(data)
+        // Send base name plus capital Translations list
+        const payload = {
+            name: data.name,
+            Translations: (data.Translations || []).map(t => ({ languageCode: t.languageCode, name: t.name }))
+        }
+        mutation.mutate(payload as any)
     }
 
     const handleBack = () => {
@@ -77,6 +99,40 @@ export default function CategoryCreate() {
                         required={true}
                         error={errors.name?.message}
                     />
+
+                    {otherLanguages.length > 0 && (
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {translationFields.map((field, idx) => (
+                                    <div key={field.id} style={{ display: activeLang === otherLanguages[idx]?.code ? 'block' : 'none' }}>
+                                        <Input
+                                            name={`Translations.${idx}.name`}
+                                            control={control}
+                                            label={`Category Name (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                            type="text"
+                                            placeholder="Enter category name"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

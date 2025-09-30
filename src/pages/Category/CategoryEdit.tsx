@@ -1,5 +1,5 @@
 import * as yup from 'yup'
-import { useForm } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useParams, useNavigate } from 'react-router'
 import Input from '../../components/Input'
@@ -8,14 +8,24 @@ import { ErrorMessage } from '../../components/Error'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { categoryService } from '../../services/category'
 import { QUERY_KEYS } from '../../constants/queryKeys'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { otherLanguages } from '../../constants'
 
-const schema = yup.object().shape({
-    name: yup.string().required("Category is required")
+const schema: yup.ObjectSchema<FormData> = yup.object({
+    name: yup.string().required("Category is required"),
+    Translations: yup.array().of(
+        yup.object({
+            languageCode: yup.string().required(),
+            name: yup.string().required()
+        })
+    ).optional()
 })
 
-type FormData = yup.InferType<typeof schema>
+type FormData = {
+    name: string;
+    Translations?: { languageCode: string; name: string }[];
+}
 
 export default function CategoryEdit() {
     const { id } = useParams<{ id: string }>()
@@ -28,8 +38,14 @@ export default function CategoryEdit() {
         reset,
         formState: { errors }
     } = useForm<FormData>({
-        resolver: yupResolver(schema)
+        resolver: yupResolver(schema),
+        defaultValues: {
+            Translations: otherLanguages.map(l => ({ languageCode: l.code, name: '' }))
+        }
     })
+
+    const { fields: translationFields, replace: replaceTranslations } = useFieldArray({ control, name: 'Translations' })
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || 'az')
 
     const { data, isLoading, isError, refetch } = useQuery({
         queryKey: [QUERY_KEYS.category, id],
@@ -54,14 +70,27 @@ export default function CategoryEdit() {
     useEffect(() => {
         if (data?.data) {
             reset({
-                name: data.data.category.name
+                name: data.data.category.name,
+                Translations: otherLanguages.map(l => {
+                    const src = (data.data.category.translations || data.data.category.Translations || []).find((t: any) => t.languageCode?.toLowerCase() === l.code.toLowerCase());
+                    return src ? { languageCode: src.languageCode, name: src.name || '' } : { languageCode: l.code, name: '' };
+                })
             })
+            const mapped = otherLanguages.map(l => {
+                const src = (data.data.category.translations || data.data.category.Translations || []).find((t: any) => t.languageCode?.toLowerCase() === l.code.toLowerCase());
+                return src ? { languageCode: src.languageCode, name: src.name || '' } : { languageCode: l.code, name: '' };
+            })
+            replaceTranslations(mapped)
         }
     }, [data, reset])
 
     const onSubmit = async (formData: FormData) => {
         if (id) {
-            mutation.mutate({ id, data: formData })
+            const payload = {
+                name: formData.name,
+                Translations: (formData.Translations || []).map(t => ({ languageCode: t.languageCode, name: t.name }))
+            }
+            mutation.mutate({ id, data: payload as any })
         }
     }
 
@@ -139,6 +168,40 @@ export default function CategoryEdit() {
                         required={true}
                         error={errors.name?.message}
                     />
+
+                    {otherLanguages.length > 0 && (
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {translationFields.map((field, idx) => (
+                                    <div key={field.id} style={{ display: activeLang === otherLanguages[idx]?.code ? 'block' : 'none' }}>
+                                        <Input
+                                            name={`Translations.${idx}.name`}
+                                            control={control}
+                                            label={`Category Name (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                            type="text"
+                                            placeholder="Enter category name"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

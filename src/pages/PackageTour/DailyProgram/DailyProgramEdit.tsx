@@ -1,20 +1,21 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router";
 import * as yup from "yup";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { QUERY_KEYS } from "../../../constants/queryKeys";
 import { packageOptionService } from "../../../services/packageTour/option";
 import { dailyProgramService } from "../../../services/packageTour/dailyProgram";
-import type { DailyProgram } from "../../../types";
+import type { DailyProgram, DailyProgramTranslation } from "../../../types";
 import Select from "../../../components/Select";
 import Input from "../../../components/Input";
 import { ArrayInput } from "../../../components/ArrayInput";
 import { paths } from "../../../constants/path";
+import { otherLanguages } from "../../../constants";
 
-const schema = yup.object({
+const schema: yup.ObjectSchema<DailyProgram> = yup.object({
     packageOptionId: yup.string().required("Package Option ID is required"),
     displayOrder: yup
         .string()
@@ -29,6 +30,16 @@ const schema = yup.object({
         .of(yup.string().required())
         .min(1, "At least one destination is required")
         .required(),
+    translations: yup
+        .array()
+        .of(
+            yup.object({
+                languageCode: yup.string().required(),
+                title: yup.string().required(),
+                destinations: yup.array().of(yup.string().required()).required(),
+            })
+        )
+        .optional(),
 });
 
 export default function DailyProgramUpdate() {
@@ -64,8 +75,16 @@ export default function DailyProgramUpdate() {
             displayOrder: "0",
             title: "",
             destinations: [],
+            translations: otherLanguages.map((l) => ({
+                languageCode: l.code,
+                title: "",
+                destinations: [],
+            })) as DailyProgramTranslation[],
         },
     });
+
+    const { fields: translationFields, replace: replaceTranslations } = useFieldArray({ control, name: "translations" });
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || "az");
 
     useEffect(() => {
         if (programData?.data) {
@@ -75,7 +94,16 @@ export default function DailyProgramUpdate() {
                 displayOrder: program.displayorder?.toString() || "0",
                 title: program.title || "",
                 destinations: program.destinations || [],
+                translations: otherLanguages.map((l) => {
+                    const found = (program.translations || []).find((t: DailyProgramTranslation) => t.languageCode?.toLowerCase() === l.code.toLowerCase());
+                    return found || { languageCode: l.code, title: "", destinations: [] };
+                }),
             });
+            const mapped = otherLanguages.map((l) => {
+                const found = (program.translations || []).find((t: DailyProgramTranslation) => t.languageCode?.toLowerCase() === l.code.toLowerCase());
+                return found || { languageCode: l.code, title: "", destinations: [] };
+            });
+            replaceTranslations(mapped);
         }
     }, [programData, reset]);
 
@@ -273,6 +301,40 @@ export default function DailyProgramUpdate() {
                             />
                         </div>
                     </div>
+
+                    {/* Translations Section */}
+                    {otherLanguages.length > 0 && (
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {translationFields.map((field, idx) => (
+                                    <div key={field.id} style={{ display: activeLang === otherLanguages[idx]?.code ? "block" : "none" }}>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <Input name={`translations.${idx}.title`} control={control} label={`Title (${otherLanguages[idx]?.code.toUpperCase()})`} type="text" placeholder="Enter title" />
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                            <ArrayInput name={`translations.${idx}.destinations`} control={control} label={`Destinations (${otherLanguages[idx]?.code.toUpperCase()})`} placeholder="Add destination..." />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

@@ -159,7 +159,7 @@ export default function TourList() {
                     onCreate={handleCreate}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
-                    onRowClick={handleRowClick}
+                    onView={handleRowClick}
                 />
             </div>
             <DeleteConfirmationModal

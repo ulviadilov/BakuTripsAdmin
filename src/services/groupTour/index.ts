@@ -14,7 +14,8 @@ const getAllTours = async (page: number, size: number) => {
 };
 
 const getById = async (id: string) => {
-    return await apiClient.get(`GroupTours/${id}`);
+    // include all translations if backend supports it
+    return await apiClient.get(`GroupTours/${id}?includeAllTranslations=true`);
 };
 
 const deleteById = async (id: string) => {
@@ -69,6 +70,21 @@ const updateTour = async (
     removeIds.forEach((exclude, index) => {
         formData.append(`removeimageids[${index}]`, exclude);
     });
+
+    // Append Translations (capital T) if provided
+    if (data.Translations && data.Translations.length > 0) {
+        data.Translations.forEach((tr, i) => {
+            formData.append(`Translations[${i}].languageCode`, tr.languageCode);
+            formData.append(`Translations[${i}].name`, tr.name);
+            formData.append(`Translations[${i}].duration`, tr.duration);
+            formData.append(`Translations[${i}].shortDescription`, tr.shortDescription);
+            formData.append(`Translations[${i}].fullDescription`, tr.fullDescription);
+            tr.includes?.forEach((val, j) => formData.append(`Translations[${i}].includes[${j}]`, val));
+            tr.excludes?.forEach((val, j) => formData.append(`Translations[${i}].excludes[${j}]`, val));
+            tr.importantInfos?.forEach((val, j) => formData.append(`Translations[${i}].importantInfos[${j}]`, val));
+            tr.tourPrograms?.forEach((val, j) => formData.append(`Translations[${i}].tourPrograms[${j}]`, val));
+        });
+    }
     return apiClient.put(`GroupTours/${id}`, formData, {
         headers: {
             "Content-Type": "multipart/form-data",

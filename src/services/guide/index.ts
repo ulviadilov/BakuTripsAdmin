@@ -6,19 +6,19 @@ const getAll = async (page: number, size: number) => {
     );
 };
 
-const createGuide = async (data: { language: string; price: number }) => {
+type GuideTranslation = { languageCode: string; language: string };
+type GuidePayload = { language: string; price: number; translations?: GuideTranslation[] };
+
+const createGuide = async (data: GuidePayload) => {
     return await apiClient.post("/TourGuides", data);
 };
 
-const updateGuide = async (
-    id: string,
-    data: { language: string; price: number }
-) => {
+const updateGuide = async (id: string, data: GuidePayload) => {
     return await apiClient.put(`/TourGuides/${id}`, data);
 };
 
 const getGuide = async (id: string) => {
-    return await apiClient.get(`/TourGuides/${id}`);
+    return await apiClient.get(`/TourGuides/${id}?includeAllTranslations=true`);
 };
 
 const deleteById = async (id: string) => {

@@ -2,6 +2,9 @@ export const QUERY_KEYS = {
     category: "category",
     user: "user",
     contact: "contact",
+    blog: {
+        all: ["blog"] as const,
+    },
     groupTour: "groupTour",
     package: "package",
     partner: {

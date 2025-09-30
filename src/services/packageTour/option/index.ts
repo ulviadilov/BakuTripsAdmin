@@ -33,6 +33,22 @@ const createOption = async (data: PackageTourOption) => {
             formData.append("tourimagefiles", file);
         });
     }
+    // Append Translations (capital T)
+    const anyData = data as any;
+    if (anyData.Translations && Array.isArray(anyData.Translations)) {
+        anyData.Translations.forEach((tr: any, i: number) => {
+            formData.append(`Translations[${i}].languageCode`, tr.languageCode);
+            formData.append(`Translations[${i}].optionName`, tr.optionName);
+            formData.append(`Translations[${i}].shortDescription`, tr.shortDescription);
+            formData.append(`Translations[${i}].apartmentInfo`, tr.apartmentInfo);
+            tr.importantInfos?.forEach((val: string, j: number) => formData.append(`Translations[${i}].importantInfos[${j}]`, val));
+            formData.append(`Translations[${i}].roomInfo`, tr.roomInfo);
+            tr.includes?.forEach((val: string, j: number) => formData.append(`Translations[${i}].includes[${j}]`, val));
+            formData.append(`Translations[${i}].fullDescription`, tr.fullDescription);
+            tr.excludes?.forEach((val: string, j: number) => formData.append(`Translations[${i}].excludes[${j}]`, val));
+            formData.append(`Translations[${i}].vehicleInfo`, tr.vehicleInfo);
+        });
+    }
     return await apiClient.post(
         "TravelPackages/create-package-option",
         formData,
@@ -53,7 +69,7 @@ const getAllOptions = async (page: number, size: number) => {
 };
 
 const getOptionById = async (id: string) => {
-    return await apiClient.get(`TravelPackages/get-package-option-by-${id}`);
+    return await apiClient.get(`TravelPackages/get-package-option-by-${id}?includeAllTranslations=true`);
 };
 
 const deleteOption = async (id: string) => {
@@ -103,6 +119,22 @@ const update = async (
     removeIds.forEach((exclude, index) => {
         formData.append(`removeimageids[${index}]`, exclude);
     });
+    // Append Translations (capital T)
+    const anyData2 = data as any;
+    if (anyData2.Translations && Array.isArray(anyData2.Translations)) {
+        anyData2.Translations.forEach((tr: any, i: number) => {
+            formData.append(`Translations[${i}].languageCode`, tr.languageCode);
+            formData.append(`Translations[${i}].optionName`, tr.optionName);
+            formData.append(`Translations[${i}].shortDescription`, tr.shortDescription);
+            formData.append(`Translations[${i}].apartmentInfo`, tr.apartmentInfo);
+            tr.importantInfos?.forEach((val: string, j: number) => formData.append(`Translations[${i}].importantInfos[${j}]`, val));
+            formData.append(`Translations[${i}].roomInfo`, tr.roomInfo);
+            tr.includes?.forEach((val: string, j: number) => formData.append(`Translations[${i}].includes[${j}]`, val));
+            formData.append(`Translations[${i}].fullDescription`, tr.fullDescription);
+            tr.excludes?.forEach((val: string, j: number) => formData.append(`Translations[${i}].excludes[${j}]`, val));
+            formData.append(`Translations[${i}].vehicleInfo`, tr.vehicleInfo);
+        });
+    }
     return await apiClient.put(
         `TravelPackages/update-package-option-by-${id}`,
         formData,

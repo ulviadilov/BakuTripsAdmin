@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { FileUpload } from "../../components/FIleUpload";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -9,6 +9,14 @@ import { paths } from "../../constants/path";
 import Input from "../../components/Input";
 import { memberService } from "../../services/member";
 import Select from "../../components/Select";
+import { teamOptions, teamOptionsI18n } from "../../constants/team";
+import { useState } from "react";
+
+const defaultLanguage = { code: "en", name: "English" };
+const otherLanguages = [
+    { code: "az", name: "Azərbaycan" },
+    { code: "ru", name: "Русский" },
+];
 
 const schema = yup.object({
     firstname: yup.string().required("First name is required"),
@@ -18,15 +26,26 @@ const schema = yup.object({
     position: yup.string().required("Position is required"),
     posterImage: yup.mixed<File>().required("Poster Image is required"),
     hoverImage: yup.mixed<File>().required("Funny Image is required"),
+    translations: yup
+        .array()
+        .of(
+            yup
+                .object({
+                    languageCode: yup.string().required(),
+                    firstname: yup.string().required("First name is required"),
+                    lastname: yup.string().required("Last name is required"),
+                    description: yup.string().required("Description is required"),
+                    position: yup.string().required("Position is required"),
+            team: yup.string().required("Team is required"),
+                })
+                .required()
+        )
+        .required(),
 });
 
-const teamOptions = [
-    { key: "operation", value: "Operations Team" },
-    { key: "sale", value: "Sales & Marketing" },
-    { key: "guide", value: "Tour Guides" },
-    { key: "drive", value: "Drivers" },
-    { key: "support", value: "Support Team" },
-]
+// team options moved to constants
+
+type MemberFormType = yup.InferType<typeof schema>;
 
 export default function MemberCreate() {
     const {
@@ -34,16 +53,32 @@ export default function MemberCreate() {
         handleSubmit,
         reset,
         formState: { errors }
-    } = useForm({
+    } = useForm<MemberFormType>({
         resolver: yupResolver(schema),
         defaultValues: {
             team: "",
             description: "",
             position: "",
             posterImage: undefined,
-            hoverImage: undefined
+            hoverImage: undefined,
+            firstname: "",
+            lastname: "",
+            translations: otherLanguages.map((lang) => ({
+                languageCode: lang.code,
+                firstname: "",
+                lastname: "",
+                description: "",
+                position: "",
+                team: "",
+            })),
         }
     });
+
+    const { fields } = useFieldArray({ control, name: "translations" });
+
+    const [activeLang, setActiveLang] = useState(
+        otherLanguages.length > 0 ? otherLanguages[0].code : ""
+    );
 
     const navigate = useNavigate();
 
@@ -60,15 +95,7 @@ export default function MemberCreate() {
         }
     });
 
-    const onSubmit = async (data: {
-        firstname: string;
-        lastname: string;
-        team: string;
-        description: string;
-        position: string;
-        posterImage: File;
-        hoverImage: File;
-    }) => {
+    const onSubmit = async (data: MemberFormType) => {
         mutation.mutate(data);
     };
 
@@ -103,7 +130,7 @@ export default function MemberCreate() {
                         <Input
                             name="firstname"
                             control={control}
-                            label="First Name"
+                            label={`First Name (${defaultLanguage.name})`}
                             type="text"
                             placeholder="Enter first name"
                             required={true}
@@ -113,7 +140,7 @@ export default function MemberCreate() {
                         <Input
                             name="lastname"
                             control={control}
-                            label="Last Name"
+                            label={`Last Name (${defaultLanguage.name})`}
                             type="text"
                             placeholder="Enter last name"
                             required={true}
@@ -146,7 +173,7 @@ export default function MemberCreate() {
                         <Input
                             name="description"
                             control={control}
-                            label="Description"
+                            label={`Description (${defaultLanguage.name})`}
                             type="textarea"
                             placeholder="Enter member description"
                             required={true}
@@ -181,6 +208,91 @@ export default function MemberCreate() {
                         error={errors.hoverImage?.message}
                         required={true}
                     />
+
+                    {/* Translations Tabs */}
+                    {otherLanguages.length > 0 && (
+                        <div className="pt-4 border-t border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code
+                                                ? "border-slate-500 text-slate-600"
+                                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {fields.map((field, index) => (
+                                    <div
+                                        key={field.id}
+                                        style={{ display: activeLang === field.languageCode ? "block" : "none" }}
+                                    >
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <Input
+                                                name={`translations.${index}.firstname`}
+                                                control={control}
+                                                label="First Name"
+                                                type="text"
+                                                placeholder="Enter first name"
+                                                required={true}
+                                                error={errors.translations?.[index]?.firstname?.message}
+                                            />
+                                            <Input
+                                                name={`translations.${index}.lastname`}
+                                                control={control}
+                                                label="Last Name"
+                                                type="text"
+                                                placeholder="Enter last name"
+                                                required={true}
+                                                error={errors.translations?.[index]?.lastname?.message}
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                            <Select
+                                                name={`translations.${index}.team`}
+                                                control={control}
+                                                label="Team"
+                                                placeholder="Select team"
+                                                required={true}
+                                                error={errors.translations?.[index]?.team?.message}
+                                                options={teamOptionsI18n[(fields[index] as any).languageCode as "az" | "ru"]}
+                                            />
+                                            <Input
+                                                name={`translations.${index}.position`}
+                                                control={control}
+                                                label="Position"
+                                                type="text"
+                                                placeholder="Enter position"
+                                                required={true}
+                                                error={errors.translations?.[index]?.position?.message}
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-1 mt-6">
+                                            <Input
+                                                name={`translations.${index}.description`}
+                                                control={control}
+                                                label="Description"
+                                                type="textarea"
+                                                placeholder="Enter member description"
+                                                required={true}
+                                                error={errors.translations?.[index]?.description?.message}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

@@ -35,7 +35,7 @@ const getPackageSelect = async () => {
 };
 
 const getPackageById = async (id: string) => {
-    return await apiClient.get(`TravelPackages/${id}`);
+    return await apiClient.get(`TravelPackages/${id}?includeAllTranslations=true`);
 };
 const updatePackage = async (id: string, data: TourFormData) => {
     const formData = new FormData();
@@ -47,6 +47,16 @@ const updatePackage = async (id: string, data: TourFormData) => {
     console.log(data)
     if (data.posterImagePath) {
         formData.append("posterimagefile", data.posterImagePath);
+    }
+
+    // Append Translations (capital T)
+    const anyData = data as any;
+    if (anyData.Translations && Array.isArray(anyData.Translations)) {
+        anyData.Translations.forEach((tr: any, i: number) => {
+            formData.append(`Translations[${i}].languageCode`, tr.languageCode);
+            formData.append(`Translations[${i}].title`, tr.title);
+            formData.append(`Translations[${i}].duration`, tr.duration);
+        });
     }
 
     return await apiClient.put(`TravelPackages/${id}`, formData, {

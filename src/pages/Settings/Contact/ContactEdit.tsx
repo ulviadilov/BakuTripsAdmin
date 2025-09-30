@@ -1,16 +1,17 @@
 import * as yup from "yup";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate, useParams } from "react-router";
 import Input from "../../../components/Input";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { contactService } from "../../../services/settings/contact";
 import toast from "react-hot-toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Spinner from "../../../components/Spinner";
 import { ErrorMessage } from "../../../components/Error";
 import { QUERY_KEYS } from "../../../constants/queryKeys";
 import { paths } from "../../../constants/path";
+import { otherLanguages } from "../../../constants";
 
 const schema = yup.object().shape({
     displayOrder: yup
@@ -29,7 +30,7 @@ const schema = yup.object().shape({
         .required("Map URL is required"),
 });
 
-type FormData = yup.InferType<typeof schema>;
+type FormData = yup.InferType<typeof schema> & { translations?: { languageCode: string; location: string; workingHours: string }[] };
 
 export default function ContactEdit() {
     const navigate = useNavigate();
@@ -49,8 +50,12 @@ export default function ContactEdit() {
             location: "",
             workingHours: "",
             mapUrl: "",
+            translations: otherLanguages.map(l => ({ languageCode: l.code, location: '', workingHours: '' }))
         },
     });
+
+    const { fields: translationFields, replace } = useFieldArray({ name: 'translations', control });
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || 'az');
 
     // Fetch contact data
     const { data, isLoading, isError, refetch } = useQuery({
@@ -86,7 +91,16 @@ export default function ContactEdit() {
                 location: contactData.location || "",
                 workingHours: contactData.workingHours || "",
                 mapUrl: contactData.mapUrl || "",
+                translations: otherLanguages.map(l => {
+                    const found = (contactData.translations || contactData.Translations || []).find((t: any) => t.languageCode?.toLowerCase() === l.code.toLowerCase());
+                    return found ? { languageCode: found.languageCode, location: found.location || '', workingHours: found.workingHours || '' } : { languageCode: l.code, location: '', workingHours: '' };
+                })
             });
+            const mapped = otherLanguages.map(l => {
+                const found = (contactData.translations || contactData.Translations || []).find((t: any) => t.languageCode?.toLowerCase() === l.code.toLowerCase());
+                return found ? { languageCode: found.languageCode, location: found.location || '', workingHours: found.workingHours || '' } : { languageCode: l.code, location: '', workingHours: '' };
+            });
+            replace(mapped);
         }
     }, [data, reset]);
 
@@ -94,7 +108,10 @@ export default function ContactEdit() {
         const srcMatch = data.mapUrl.match(/src="([^"]+)"/);
         const extractedSrc = srcMatch ? srcMatch[1] : '';
         data.mapUrl = extractedSrc ? extractedSrc : data.mapUrl;
-        mutation.mutate(data);
+        mutation.mutate({
+            ...data,
+            translations: (data.translations || []).map(t => ({ languageCode: t.languageCode, location: t.location, workingHours: t.workingHours }))
+        });
     };
 
     const handleBack = () => {
@@ -226,6 +243,37 @@ export default function ContactEdit() {
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
                     ></iframe>
+
+                    {/* Translations Section */}
+                    {otherLanguages.length > 0 && (
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {translationFields.map((field, idx) => (
+                                    <div key={field.id} style={{ display: activeLang === otherLanguages[idx]?.code ? 'block' : 'none' }}>
+                                        <Input name={`translations.${idx}.location`} control={control} label={`Location (${otherLanguages[idx]?.code.toUpperCase()})`} type="text" placeholder="Enter location" />
+                                        <div className="mt-4" />
+                                        <Input name={`translations.${idx}.workingHours`} control={control} label={`Working Hours (${otherLanguages[idx]?.code.toUpperCase()})`} type="text" placeholder="Enter working hours" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

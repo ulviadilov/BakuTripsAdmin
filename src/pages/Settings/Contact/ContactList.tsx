@@ -131,7 +131,7 @@ export default function ContactList() {
                     onCreate={handleCreate}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
-                    onRowClick={handleRowClick}
+                    onView={handleRowClick}
                 />
             </div>
             <DeleteConfirmationModal

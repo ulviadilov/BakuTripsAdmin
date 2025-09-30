@@ -24,6 +24,16 @@ const memberCreate = async (data: MemberRequest) => {
     if (data.hoverImage) {
         formData.append("hoverImage", data.hoverImage);
     }
+    if (data.translations && data.translations.length > 0) {
+        data.translations.forEach((tr, index) => {
+            formData.append(`translations[${index}].languageCode`, tr.languageCode);
+            formData.append(`translations[${index}].firstname`, tr.firstname);
+            formData.append(`translations[${index}].lastname`, tr.lastname);
+            formData.append(`translations[${index}].description`, tr.description);
+            formData.append(`translations[${index}].position`, tr.position);
+            formData.append(`translations[${index}].team`, tr.team);
+        });
+    }
 
     return await apiClient.post("/TeamMembers", formData, {
         headers: {
@@ -63,6 +73,16 @@ const updateMember = async (id: string, data: MemberRequestUpdate) => {
     }
     if (data.hoverImage) {
         formData.append("hoverImage", data.hoverImage);
+    }
+    if (data.translations && data.translations.length > 0) {
+        data.translations.forEach((tr, index) => {
+            formData.append(`translations[${index}].languageCode`, tr.languageCode);
+            formData.append(`translations[${index}].firstname`, tr.firstname);
+            formData.append(`translations[${index}].lastname`, tr.lastname);
+            formData.append(`translations[${index}].description`, tr.description);
+            formData.append(`translations[${index}].position`, tr.position);
+            formData.append(`translations[${index}].team`, tr.team);
+        });
     }
 
     return await apiClient.put(`/TeamMembers/${id}`, formData, {

@@ -56,6 +56,10 @@ import MemberUpdate from "../pages/TeamMembers/MemberUpdate";
 import PromoCodeList from "../pages/PromoCode/PromoCodeList";
 import PromoCodeCreate from "../pages/PromoCode/PromoCodeCreate";
 import PromoCodeUpdate from "../pages/PromoCode/PromoCodeUpdate";
+import BlogList from "../pages/Blogs/BlogList";
+import BlogCreate from "../pages/Blogs/BlogCreate";
+import BlogEdit from "../pages/Blogs/BlogEdit";
+import BlogDetail from "../pages/Blogs/BlogDetail";
 
 export const router = createBrowserRouter([
     {
@@ -70,6 +74,22 @@ export const router = createBrowserRouter([
                 index: true,
                 path: paths.DASHBOARD,
                 element: <Dashboard />,
+            },
+            {
+                path: paths.BLOG.LIST,
+                element: <BlogList />,
+            },
+            {
+                path: paths.BLOG.CREATE,
+                element: <BlogCreate />,
+            },
+            {
+                path: paths.BLOG.EDIT(),
+                element: <BlogEdit />,
+            },
+            {
+                path: paths.BLOG.DETAIL(),
+                element: <BlogDetail />,
             },
             {
                 path: paths.SLIDER.LIST,

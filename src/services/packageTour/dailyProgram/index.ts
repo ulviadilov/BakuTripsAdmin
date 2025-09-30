@@ -10,7 +10,7 @@ const getAllDailyPrograms = async(page:number,size:number)=>{
 }
 
 const getDailyProgramById = async(id:string)=>{
-    return await apiClient.get(`/TravelPackages/get-daily-program-by-${id}`)
+    return await apiClient.get(`/TravelPackages/get-daily-program-by-${id}?includeAllTranslations=true`)
 }
 
 const deleteDailyProgram = async(id:string)=>{

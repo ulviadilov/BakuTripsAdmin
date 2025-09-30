@@ -5,6 +5,12 @@ export const paths = {
         CREATE: "/slider/create",
         EDIT: (id = ":id") => `/slider/${id}`,
     },
+    BLOG: {
+        LIST: "/blogs",
+        CREATE: "/blogs/create",
+        EDIT: (id = ":id") => `/blogs/${id}`,
+        DETAIL: (id = ":id") => `/blogs/detail/${id}`,
+    },
     PARTNERS: {
         LIST: "/partners",
         CREATE: "/partners/create",
@@ -121,7 +127,7 @@ export const navItems = [
     { label: "Promo Codes", icon: Percent, path: paths.PROMO_CODES.LIST },
     { label: "Partners", icon: Building2, path: paths.PARTNERS.LIST },
     { label: "Team Members", icon: Users2, path: paths.MEMBER.LIST },
-    { label: "Blogs", icon: Newspaper, path: "/blogs" },
+    { label: "Blogs", icon: Newspaper, path: paths.BLOG.LIST },
     { label: "Guide", icon: User, path: paths.GUIDE.LIST },
     {
         label: "Tours",

@@ -1,12 +1,14 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import * as yup from "yup";
 import { privateTourService } from "../../../services/privateTour";
 import { QUERY_KEYS } from "../../../constants/queryKeys";
 import type { PrivatePackageFormData } from "../../../services/privateTour/types";
+import { otherLanguages } from "../../../constants";
 import Select from "../../../components/Select";
 import Input from "../../../components/Input";
 import { paths } from "../../../constants/path";
@@ -36,8 +38,12 @@ export default function PrivatePackageCreate() {
             tourid: '',
             vehicleinfo: '',
             price: "",
+            translations: otherLanguages.map((l) => ({ languageCode: l.code, vehicleinfo: "" })),
         }
     });
+
+    const { fields } = useFieldArray({ control, name: "translations" });
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || "az");
 
     const mutation = useMutation({
         mutationFn: privateTourService.createPrivatePackage,
@@ -53,7 +59,7 @@ export default function PrivatePackageCreate() {
     });
 
     const onSubmit = async (data: PrivatePackageFormData) => {
-        const formData = {
+        const formData: PrivatePackageFormData = {
             ...data,
             price: data.price
         };
@@ -122,6 +128,41 @@ export default function PrivatePackageCreate() {
                         />
                     </div>
 
+
+                    {/* Translations Tabs at bottom (only vehicleinfo) */}
+                    {otherLanguages.length > 0 && (
+                        <div className="pt-4 border-t border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {fields.map((field, index) => (
+                                    <div key={field.id} style={{ display: activeLang === field.languageCode ? 'block' : 'none' }}>
+                                        <Input
+                                            name={`translations.${index}.vehicleinfo`}
+                                            control={control}
+                                            label={`Vehicle Info (${field.languageCode.toUpperCase()})`}
+                                            type="text"
+                                            placeholder="Enter vehicle info"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

@@ -134,7 +134,7 @@ export default function TourOptionList() {
                     onCreate={handleCreate}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
-                    onRowClick={handleRowClick}
+                    onView={handleRowClick}
                 />
             </div>
             <DeleteConfirmationModal

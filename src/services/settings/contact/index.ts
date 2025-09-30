@@ -11,7 +11,7 @@ async function getAll(){
 }
 
 async function getById(id:string){
-    return await apiClient.get(`/ContactInfos/get-by-id?id=${id}`)
+    return await apiClient.get(`/ContactInfos/get-by-id?id=${id}&includeAllTranslations=true`)
 }
 
 async function update(id:string,payload:ContactPayload){

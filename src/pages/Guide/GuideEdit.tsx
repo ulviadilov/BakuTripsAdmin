@@ -1,22 +1,38 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router";
 import * as yup from "yup";
 import Input from "../../components/Input";
 import { paths } from "../../constants/path";
 import { guideService } from "../../services/guide";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { otherLanguages } from "../../constants";
 
 interface GuideFormData {
     language: string;
     price: string;
+    translations: Array<{
+        languageCode: string;
+        language: string;
+    }>;
 }
 
 const schema = yup.object({
     language: yup.string().required("Language is required"),
     price: yup.string().required("Price is required"),
+    translations: yup
+        .array()
+        .of(
+            yup
+                .object({
+                    languageCode: yup.string().required(),
+                    language: yup.string().required("Language is required"),
+                })
+                .required()
+        )
+        .required(),
 });
 
 export default function GuideEdit() {
@@ -33,8 +49,15 @@ export default function GuideEdit() {
         defaultValues: {
             language: "",
             price: "",
+            translations: otherLanguages.map((lang) => ({
+                languageCode: lang.code,
+                language: "",
+            })),
         }
     });
+
+    const { fields, replace } = useFieldArray({ control, name: "translations" });
+    const [activeLang, setActiveLang] = useState(otherLanguages[0]?.code ?? "");
 
     // Fetch existing guide data
     const { data: guideData, isLoading, error } = useQuery({
@@ -49,7 +72,23 @@ export default function GuideEdit() {
             reset({
                 language: guideData?.data?.tourGuide?.language || "",
                 price: guideData?.data?.tourGuide?.price?.toString() || "",
+                translations: otherLanguages.map((lang) => {
+                    const tr = guideData?.data?.tourGuide?.translations?.find((t: any) => t.languageCode === lang.code);
+                    return {
+                        languageCode: lang.code,
+                        language: tr?.language || "",
+                    };
+                }),
             });
+            replace(
+                otherLanguages.map((lang) => {
+                    const tr = guideData?.data?.tourGuide?.translations?.find((t: any) => t.languageCode === lang.code);
+                    return {
+                        languageCode: lang.code,
+                        language: tr?.language || "",
+                    };
+                })
+            );
         }
     }, [guideData, reset]);
 
@@ -143,7 +182,7 @@ export default function GuideEdit() {
                         <Input
                             name="language"
                             control={control}
-                            label="Language"
+                            label="Language (English)"
                             type="text"
                             placeholder="Enter Language"
                             required={true}
@@ -160,6 +199,50 @@ export default function GuideEdit() {
                             error={errors.price?.message}
                         />
                     </div>
+
+                    {otherLanguages.length > 0 && (
+                        <div className="pt-4 border-t border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code
+                                                ? "border-slate-500 text-slate-600"
+                                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {fields.map((field, index) => (
+                                    <div
+                                        key={field.id}
+                                        style={{ display: activeLang === field.languageCode ? "block" : "none" }}
+                                    >
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <Input
+                                                name={`translations.${index}.language`}
+                                                control={control}
+                                                label="Language"
+                                                type="text"
+                                                placeholder="Enter Language"
+                                                required={true}
+                                                error={errors.translations?.[index]?.language?.message}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="pt-4 flex items-center space-x-3">
                         <button

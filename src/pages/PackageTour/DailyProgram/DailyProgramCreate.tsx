@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import * as yup from "yup";
@@ -11,10 +11,12 @@ import Select from "../../../components/Select";
 import { QUERY_KEYS } from "../../../constants/queryKeys";
 import Input from "../../../components/Input";
 import { ArrayInput } from "../../../components/ArrayInput";
-import type { DailyProgram } from "../../../types";
+import type { DailyProgram, DailyProgramTranslation } from "../../../types";
+import { otherLanguages } from "../../../constants";
+import { useState } from "react";
 
 
-const schema = yup.object({
+const schema: yup.ObjectSchema<DailyProgram> = yup.object({
     packageOptionId: yup.string().required("Package option is required"),
     displayOrder: yup
         .string()
@@ -26,6 +28,16 @@ const schema = yup.object({
         .of(yup.string().required())
         .min(1, "At least one destination is required")
         .required("Destinations are required"),
+    translations: yup
+        .array()
+        .of(
+            yup.object({
+                languageCode: yup.string().required(),
+                title: yup.string().required(),
+                destinations: yup.array().of(yup.string().required()).required(),
+            })
+        )
+        .optional(),
 });
 
 export default function DailyProgramCreate() {
@@ -43,8 +55,16 @@ export default function DailyProgramCreate() {
             displayOrder: "0",
             title: "",
             destinations: [],
+            translations: otherLanguages.map(l => ({
+                languageCode: l.code,
+                title: "",
+                destinations: [],
+            })) as DailyProgramTranslation[],
         },
     });
+
+    const { fields: translationFields } = useFieldArray({ control, name: "translations" });
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || "az");
 
     // Fetch package options
     const { data: packageOptions, isLoading } = useQuery({
@@ -71,6 +91,11 @@ export default function DailyProgramCreate() {
             displayOrder: data.displayOrder,
             title: data.title,
             destinations: data.destinations,
+            translations: (data.translations || []).map(t => ({
+                languageCode: t.languageCode,
+                title: t.title,
+                destinations: t.destinations || [],
+            })),
         };
 
         mutation.mutate(submitData);
@@ -185,6 +210,40 @@ export default function DailyProgramCreate() {
                             />
                         </div>
                     </div>
+
+                    {/* Translations Section */}
+                    {otherLanguages.length > 0 && (
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {translationFields.map((field, idx) => (
+                                    <div key={field.id} style={{ display: activeLang === otherLanguages[idx]?.code ? "block" : "none" }}>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <Input name={`translations.${idx}.title`} control={control} label={`Title (${otherLanguages[idx]?.code.toUpperCase()})`} type="text" placeholder="Enter title" />
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                            <ArrayInput name={`translations.${idx}.destinations`} control={control} label={`Destinations (${otherLanguages[idx]?.code.toUpperCase()})`} placeholder="Add destination..." />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router";
 import * as yup from "yup";
@@ -12,8 +12,9 @@ import { groupTourService } from "../../services/groupTour";
 import { QUERY_KEYS } from "../../constants/queryKeys";
 import { categoryService } from "../../services/category";
 import Select from "../../components/Select";
-import type {TourFormDataGet } from "../../types";
+import type {TourFormDataGet, GroupTourTranslation } from "../../types";
 import { paths } from "../../constants/path";
+import { otherLanguages } from "../../constants";
 
 const schema = yup.object({
     tourCategoryId: yup.string().required("Tour Category ID is required"),
@@ -122,8 +123,25 @@ export default function TourUpdate() {
             posterImageFile: null,
             vrimagefile: null,
             tourImages: [],
+            Translations: otherLanguages.map((l) => ({
+                languageCode: l.code,
+                name: "",
+                duration: "",
+                shortDescription: "",
+                fullDescription: "",
+                includes: [],
+                excludes: [],
+                importantInfos: [],
+                tourPrograms: [],
+            } as GroupTourTranslation)),
         },
     });
+
+    const { fields: translationFields } = useFieldArray({
+        control,
+        name: "Translations",
+    });
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || "az");
 
     const [removeIds,setRemoveIds] = useState<string[]>([]);
     const [newImagesFiles,setNewImageFiles] = useState<File[]>([])
@@ -131,6 +149,23 @@ export default function TourUpdate() {
     useEffect(() => {
         if (tourData?.data?.grouptour) {
             const tour = tourData?.data?.grouptour;
+            const serverTranslations: GroupTourTranslation[] = (tour.Translations || []).map((t: any) => ({
+                languageCode: t.languageCode,
+                name: t.name ?? "",
+                duration: t.duration ?? "",
+                shortDescription: t.shortDescription ?? "",
+                fullDescription: t.fullDescription ?? "",
+                includes: t.includes ?? [],
+                excludes: t.excludes ?? [],
+                importantInfos: t.importantInfos ?? [],
+                tourPrograms: t.tourPrograms ?? [],
+            }));
+
+            const translationsByLang: Record<string, GroupTourTranslation> = {};
+            serverTranslations.forEach((tr) => {
+                translationsByLang[tr.languageCode] = tr;
+            });
+
             reset({
                 tourCategoryId: tour.tourCategoryId || "",
                 order: tour.order?.toString() || "0",
@@ -150,6 +185,19 @@ export default function TourUpdate() {
                 posterImageFile: null,
                 vrimagefile: null,
                 tourImages: [],
+                Translations: otherLanguages.map((l) =>
+                    translationsByLang[l.code] || {
+                        languageCode: l.code,
+                        name: "",
+                        duration: "",
+                        shortDescription: "",
+                        fullDescription: "",
+                        includes: [],
+                        excludes: [],
+                        importantInfos: [],
+                        tourPrograms: [],
+                    }
+                ),
             });
         }
     }, [tourData, reset]);
@@ -430,10 +478,10 @@ export default function TourUpdate() {
                         </div>
                     </div>
 
-                    {/* Descriptions Section */}
+                    {/* Base Language Descriptions Section (default language) */}
                     <div className="bg-white p-6 rounded-lg border border-gray-200">
                         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                            Descriptions
+                            Descriptions (Default Language)
                         </h2>
                         <div className="space-y-6">
                             <div className="space-y-2">
@@ -485,6 +533,7 @@ export default function TourUpdate() {
                             </div>
                         </div>
                     </div>
+
 
                     {/* Tour Details Section */}
                     <div className="bg-white p-6 rounded-lg border border-gray-200">
@@ -668,6 +717,99 @@ export default function TourUpdate() {
                             />
                         </div>
                     </div>
+                                        {otherLanguages.length > 0 && (
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {translationFields.map((field, idx) => (
+                                    <div
+                                        key={field.id}
+                                        style={{ display: activeLang === otherLanguages[idx]?.code ? "block" : "none" }}
+                                    >
+                                        <div className="space-y-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <Input
+                                                    name={`Translations.${idx}.name`}
+                                                    control={control}
+                                                    label={`Name (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    type="text"
+                                                    placeholder="Enter tour name"
+                                                />
+                                                <Input
+                                                    name={`Translations.${idx}.duration`}
+                                                    control={control}
+                                                    label={`Duration (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    type="text"
+                                                    placeholder="e.g., 3 days, 1 week"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="block text-sm font-medium text-gray-700">Short Description ({otherLanguages[idx]?.code.toUpperCase()})</label>
+                                                <Controller
+                                                    name={`Translations.${idx}.shortDescription`}
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <textarea {...field} rows={3} placeholder="Enter short description" className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500" />
+                                                    )}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="block text-sm font-medium text-gray-700">Full Description ({otherLanguages[idx]?.code.toUpperCase()})</label>
+                                                <Controller
+                                                    name={`Translations.${idx}.fullDescription`}
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <textarea {...field} rows={6} placeholder="Enter full description" className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500" />
+                                                    )}
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <ArrayInput
+                                                    name={`Translations.${idx}.includes`}
+                                                    control={control}
+                                                    label={`Includes (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    placeholder="Add what's included..."
+                                                />
+                                                <ArrayInput
+                                                    name={`Translations.${idx}.excludes`}
+                                                    control={control}
+                                                    label={`Excludes (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    placeholder="Add what's excluded..."
+                                                />
+                                                <ArrayInput
+                                                    name={`Translations.${idx}.importantInfos`}
+                                                    control={control}
+                                                    label={`Important Information (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    placeholder="Add important info..."
+                                                />
+                                                <ArrayInput
+                                                    name={`Translations.${idx}.tourPrograms`}
+                                                    control={control}
+                                                    label={`Tour Programs (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    placeholder="Add tour program..."
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

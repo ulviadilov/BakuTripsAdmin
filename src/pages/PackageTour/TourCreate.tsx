@@ -1,6 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import * as yup from "yup";
@@ -8,6 +9,7 @@ import Input from "../../components/Input";
 import { FileUpload } from "../../components/FIleUpload";
 import { packageTourService } from "../../services/packageTour";
 import { paths } from "../../constants/path";
+import { otherLanguages } from "../../constants";
 
 interface TourFormData {
     displayOrder: string;
@@ -15,6 +17,8 @@ interface TourFormData {
     duration: string;
     basePrice: string;
     posterImageFile: File | string;
+    // Capital Translations for backend
+    Translations: { languageCode: string; title: string; duration: string }[];
 }
 
 const schema = yup.object({
@@ -31,6 +35,17 @@ const schema = yup.object({
     posterImageFile: yup
         .mixed<File | string>()
         .required("Poster image is required"),
+    // Optional translations block
+    Translations: yup
+        .array()
+        .of(
+            yup.object({
+                languageCode: yup.string().required(),
+                title: yup.string().defined(),
+                duration: yup.string().defined(),
+            })
+        )
+        .required(),
 });
 
 export default function TourCreate() {
@@ -49,8 +64,16 @@ export default function TourCreate() {
             title: "",
             duration: "",
             posterImageFile: "",
+            Translations: otherLanguages.map((l) => ({
+                languageCode: l.code,
+                title: "",
+                duration: "",
+            })),
         },
     });
+
+    const { fields: translationFields } = useFieldArray({ control, name: "Translations" });
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || "az");
 
     const mutation = useMutation({
         mutationFn: packageTourService.createTourPackage,
@@ -75,6 +98,13 @@ export default function TourCreate() {
         if (data.posterImageFile) {
             formData.append("posterImageFile", data.posterImageFile);
         }
+
+        // Append Translations (capital T)
+        data.Translations?.forEach((tr, i) => {
+            formData.append(`Translations[${i}].languageCode`, tr.languageCode);
+            formData.append(`Translations[${i}].title`, tr.title);
+            formData.append(`Translations[${i}].duration`, tr.duration);
+        });
 
         mutation.mutate(formData);
     };
@@ -188,6 +218,53 @@ export default function TourCreate() {
                             />
                         </div>
                     </div>
+
+                    {/* Translations Section */}
+                    {otherLanguages.length > 0 && (
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {translationFields.map((field, idx) => (
+                                    <div
+                                        key={field.id}
+                                        style={{ display: activeLang === otherLanguages[idx]?.code ? "block" : "none" }}
+                                    >
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <Input
+                                                name={`Translations.${idx}.title`}
+                                                control={control}
+                                                label={`Title (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                type="text"
+                                                placeholder="Enter title"
+                                            />
+                                            <Input
+                                                name={`Translations.${idx}.duration`}
+                                                control={control}
+                                                label={`Duration (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                type="text"
+                                                placeholder="e.g., 3 days, 1 week"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

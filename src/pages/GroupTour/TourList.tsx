@@ -146,7 +146,7 @@ export default function TourList() {
                     }}
                     onCreate={handleCreate}
                     onEdit={handleEdit}
-                    onRowClick={handleRowClick}
+                    onView={handleRowClick}
                     onDelete={handleDelete}
                 />
             </div>

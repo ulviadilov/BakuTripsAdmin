@@ -1,6 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import * as yup from "yup";
@@ -11,6 +12,8 @@ import { groupTourService } from "../../services/groupTour";
 import { QUERY_KEYS } from "../../constants/queryKeys";
 import { categoryService } from "../../services/category";
 import Select from "../../components/Select";
+import { otherLanguages } from "../../constants";
+import type { GroupTourTranslation } from "../../types";
 
 interface TourFormData {
     tourCategoryId: string;
@@ -31,7 +34,21 @@ interface TourFormData {
     posterImageFile: File | null;
     vrimagefile: File | null;
     tourImageFiles: File[];
+    // Translations with capital T (backend requirement)
+    Translations: GroupTourTranslation[];
 }
+const translationSchema = yup.object({
+    languageCode: yup.string().required(),
+    name: yup.string().defined(),
+    duration: yup.string().defined(),
+    shortDescription: yup.string().defined(),
+    fullDescription: yup.string().defined(),
+    includes: yup.array().of(yup.string().defined()).defined(),
+    excludes: yup.array().of(yup.string().defined()).defined(),
+    importantInfos: yup.array().of(yup.string().defined()).defined(),
+    tourPrograms: yup.array().of(yup.string().defined()).defined(),
+});
+
 const schema = yup.object({
     tourCategoryId: yup.string().required("Tour Category ID is required"),
     order: yup
@@ -97,6 +114,10 @@ const schema = yup.object({
         .of(yup.mixed<File>().required())
         .min(1, "At least one tour image is required")
         .required(),
+    Translations: yup
+        .array()
+        .of(translationSchema)
+        .required(),
 });
 
 export default function TourCreate() {
@@ -133,8 +154,27 @@ export default function TourCreate() {
             posterImageFile: null,
             vrimagefile: null,
             tourImageFiles: [],
+            Translations: otherLanguages.map((l) => ({
+                languageCode: l.code,
+                name: "",
+                duration: "",
+                shortDescription: "",
+                fullDescription: "",
+                includes: [],
+                excludes: [],
+                importantInfos: [],
+                tourPrograms: [],
+            })),
         },
     });
+
+    const { fields: translationFields } = useFieldArray({
+        control,
+        name: "Translations",
+    });
+
+    // Active tab for translations
+    const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || "az");
 
     const mutation = useMutation({
         mutationFn: groupTourService.createTour,
@@ -190,6 +230,19 @@ export default function TourCreate() {
                 formData.append(`tourImageFiles`, file);
             });
         }
+
+        // Append Translations (capital T)
+        data.Translations?.forEach((tr, i) => {
+            formData.append(`Translations[${i}].languageCode`, tr.languageCode);
+            formData.append(`Translations[${i}].name`, tr.name);
+            formData.append(`Translations[${i}].duration`, tr.duration);
+            formData.append(`Translations[${i}].shortDescription`, tr.shortDescription);
+            formData.append(`Translations[${i}].fullDescription`, tr.fullDescription);
+            tr.includes?.forEach((val, j) => formData.append(`Translations[${i}].includes[${j}]`, val));
+            tr.excludes?.forEach((val, j) => formData.append(`Translations[${i}].excludes[${j}]`, val));
+            tr.importantInfos?.forEach((val, j) => formData.append(`Translations[${i}].importantInfos[${j}]`, val));
+            tr.tourPrograms?.forEach((val, j) => formData.append(`Translations[${i}].tourPrograms[${j}]`, val));
+        });
 
         mutation.mutate(formData);
     };
@@ -364,10 +417,10 @@ export default function TourCreate() {
                         </div>
                     </div>
 
-                    {/* Descriptions Section */}
+                    {/* Base Language Descriptions Section (default language) */}
                     <div className="bg-white p-6 rounded-lg border border-gray-200">
                         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                            Descriptions
+                            Descriptions (Default Language)
                         </h2>
                         <div className="space-y-6">
                             <div className="space-y-2">
@@ -419,6 +472,7 @@ export default function TourCreate() {
                             </div>
                         </div>
                     </div>
+
 
                     {/* Tour Details Section */}
                     <div className="bg-white p-6 rounded-lg border border-gray-200">
@@ -576,6 +630,99 @@ export default function TourCreate() {
                             />
                         </div>
                     </div>
+                                        {otherLanguages.length > 0 && (
+                        <div className="bg-white p-6 rounded-lg border border-gray-200">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <div className="border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {otherLanguages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            onClick={() => setActiveLang(lang.code)}
+                                            className={`${activeLang === lang.code ? "border-slate-500 text-slate-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {translationFields.map((field, idx) => (
+                                    <div
+                                        key={field.id}
+                                        style={{ display: activeLang === otherLanguages[idx]?.code ? "block" : "none" }}
+                                    >
+                                        <div className="space-y-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <Input
+                                                    name={`Translations.${idx}.name`}
+                                                    control={control}
+                                                    label={`Name (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    type="text"
+                                                    placeholder="Enter tour name"
+                                                />
+                                                <Input
+                                                    name={`Translations.${idx}.duration`}
+                                                    control={control}
+                                                    label={`Duration (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    type="text"
+                                                    placeholder="e.g., 3 days, 1 week"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="block text-sm font-medium text-gray-700">Short Description ({otherLanguages[idx]?.code.toUpperCase()})</label>
+                                                <Controller
+                                                    name={`Translations.${idx}.shortDescription`}
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <textarea {...field} rows={3} placeholder="Enter short description" className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500" />
+                                                    )}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="block text-sm font-medium text-gray-700">Full Description ({otherLanguages[idx]?.code.toUpperCase()})</label>
+                                                <Controller
+                                                    name={`Translations.${idx}.fullDescription`}
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <textarea {...field} rows={6} placeholder="Enter full description" className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500" />
+                                                    )}
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <ArrayInput
+                                                    name={`Translations.${idx}.includes`}
+                                                    control={control}
+                                                    label={`Includes (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    placeholder="Add what's included..."
+                                                />
+                                                <ArrayInput
+                                                    name={`Translations.${idx}.excludes`}
+                                                    control={control}
+                                                    label={`Excludes (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    placeholder="Add what's excluded..."
+                                                />
+                                                <ArrayInput
+                                                    name={`Translations.${idx}.importantInfos`}
+                                                    control={control}
+                                                    label={`Important Information (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    placeholder="Add important info..."
+                                                />
+                                                <ArrayInput
+                                                    name={`Translations.${idx}.tourPrograms`}
+                                                    control={control}
+                                                    label={`Tour Programs (${otherLanguages[idx]?.code.toUpperCase()})`}
+                                                    placeholder="Add tour program..."
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Submit Buttons */}
                     <div className="pt-4 flex items-center space-x-3">

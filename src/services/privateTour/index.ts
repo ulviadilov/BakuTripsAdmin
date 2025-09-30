@@ -4,6 +4,7 @@ import type { PrivatePackageFormData } from "./types";
 
 const createTour = async (data: PrivateFormData) => {
     const formData = new FormData();
+    // Create (camelCase keys as per backend create endpoint convention)
     formData.append("tourCategoryId", data.tourcategoryid);
     formData.append("order", data.order.toString());
     formData.append("name", data.name);
@@ -38,6 +39,21 @@ const createTour = async (data: PrivateFormData) => {
             formData.append(`tourimagefiles`, file);
         });
     }
+
+    // Append Translations (capital T) if provided
+    if (data.Translations && data.Translations.length > 0) {
+        data.Translations.forEach((tr, i) => {
+            formData.append(`Translations[${i}].languageCode`, tr.languageCode);
+            formData.append(`Translations[${i}].name`, tr.name);
+            formData.append(`Translations[${i}].duration`, tr.duration);
+            formData.append(`Translations[${i}].shortDescription`, tr.shortDescription);
+            formData.append(`Translations[${i}].fullDescription`, tr.fullDescription);
+            tr.includes?.forEach((val, j) => formData.append(`Translations[${i}].includes[${j}]`, val));
+            tr.excludes?.forEach((val, j) => formData.append(`Translations[${i}].excludes[${j}]`, val));
+            tr.importantInfos?.forEach((val, j) => formData.append(`Translations[${i}].importantInfos[${j}]`, val));
+            tr.tourPrograms?.forEach((val, j) => formData.append(`Translations[${i}].tourPrograms[${j}]`, val));
+        });
+    }
     return await apiClient.post("PrivateTours/create-private-tour", formData, {
         headers: {
             "Content-Type": "multipart/form-data",
@@ -54,7 +70,8 @@ const deleteById = async (id: string) => {
 };
 
 const getById = async (id: string) => {
-    return await apiClient.get(`/PrivateTours/${id}`);
+    // include all translations for edit pages
+    return await apiClient.get(`/PrivateTours/${id}?includeAllTranslations=true`);
 };
 
 const updateTour = async (
@@ -99,6 +116,20 @@ const updateTour = async (
         });
     }
 
+    // Append Translations (capital T) if provided
+    if (data.Translations && data.Translations.length > 0) {
+        data.Translations.forEach((tr, i) => {
+            formData.append(`Translations[${i}].languageCode`, tr.languageCode);
+            formData.append(`Translations[${i}].name`, tr.name);
+            formData.append(`Translations[${i}].duration`, tr.duration);
+            formData.append(`Translations[${i}].shortDescription`, tr.shortDescription);
+            formData.append(`Translations[${i}].fullDescription`, tr.fullDescription);
+            tr.includes?.forEach((val, j) => formData.append(`Translations[${i}].includes[${j}]`, val));
+            tr.excludes?.forEach((val, j) => formData.append(`Translations[${i}].excludes[${j}]`, val));
+            tr.importantInfos?.forEach((val, j) => formData.append(`Translations[${i}].importantInfos[${j}]`, val));
+            tr.tourPrograms?.forEach((val, j) => formData.append(`Translations[${i}].tourPrograms[${j}]`, val));
+        });
+    }
     removeIds.forEach((exclude, index) => {
         formData.append(`removeimageids[${index}]`, exclude);
     });
@@ -118,6 +149,12 @@ const createPrivatePackage = async (data: PrivatePackageFormData) => {
     formData.append("tourid", data.tourid);
     formData.append("vehicleinfo", data.vehicleinfo);
     formData.append("price", data.price);
+    if (data.translations && data.translations.length > 0) {
+        data.translations.forEach((tr, i) => {
+            formData.append(`translations[${i}].languageCode`, tr.languageCode);
+            formData.append(`translations[${i}].vehicleinfo`, tr.vehicleinfo);
+        });
+    }
     return await apiClient.post(
         "/PrivateTours/create-private-tour-package",
         formData,
@@ -136,7 +173,7 @@ const getAllPrivatePackages = async (page: number, size: number) => {
 };
 
 const getPackageById = async (id: string) => {
-    return await apiClient.get(`/PrivateTours/get-private-tour-packages-by-${id}`);
+    return await apiClient.get(`/PrivateTours/get-private-tour-packages-by-${id}?includeAllTranslations=true`);
 };
 
 const deletePackage = async (id: string) => {
@@ -153,6 +190,12 @@ const updatePrivatePackage = async (
     formData.append("tourid", data.tourid);
     formData.append("vehicleinfo", data.vehicleinfo);
     formData.append("price", data.price);
+    if (data.translations && data.translations.length > 0) {
+        data.translations.forEach((tr, i) => {
+            formData.append(`translations[${i}].languageCode`, tr.languageCode);
+            formData.append(`translations[${i}].vehicleinfo`, tr.vehicleinfo);
+        });
+    }
     return await apiClient.put(
         `/PrivateTours/${id}-update-private-tour-package`,
         formData,
