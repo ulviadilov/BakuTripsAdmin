@@ -744,14 +744,14 @@ export default function TourUpdate() {
                                         <div className="space-y-6">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <Input
-                                                    name={`Translations.${idx}.name`}
+                                                    name={`translations.${idx}.name`}
                                                     control={control}
                                                     label={`Name (${otherLanguages[idx]?.code.toUpperCase()})`}
                                                     type="text"
                                                     placeholder="Enter tour name"
                                                 />
                                                 <Input
-                                                    name={`Translations.${idx}.duration`}
+                                                    name={`translations.${idx}.duration`}
                                                     control={control}
                                                     label={`Duration (${otherLanguages[idx]?.code.toUpperCase()})`}
                                                     type="text"
