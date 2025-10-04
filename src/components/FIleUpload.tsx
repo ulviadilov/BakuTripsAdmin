@@ -29,6 +29,8 @@ interface FileUploadProps {
     multiple?: boolean;
     maxSize?: number;
     maxFiles?: number;
+    // Maximum file size (in MB) to generate an inline preview for. Larger files will skip preview to avoid UI freezes.
+    maxPreviewSizeMB?: number;
     onFilesChange?: (files: File[] | string | string[] | null | File) => void;
     className?: string;
     label?: string;
@@ -47,6 +49,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     multiple = false,
     maxSize = 10,
     maxFiles = 5,
+    maxPreviewSizeMB = 8,
     onFilesChange,
     className = "",
     label = "Upload Files",
@@ -93,7 +96,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         }
     }, [initialUrls]);
 
-    console.log(uploadedFiles);
+    // console.log(uploadedFiles);
 
     const isImageFile = (file: File) => file.type.startsWith("image/");
 
@@ -161,7 +164,6 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         files: FileList | File[],
         onChange?: (files: File[] | File | null) => void
     ) => {
-        setIsProcessing(true);
         const fileArray = Array.from(files);
 
         if (uploadedFiles.length + fileArray.length > maxFiles) {
@@ -185,10 +187,16 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             };
 
             // Use object URLs for previews to avoid large base64 memory and main-thread work
+            // For very large images, skip preview generation to prevent frame drops during decode
             if (isImageFile(file) && !error) {
-                const objectUrl = URL.createObjectURL(file);
-                uploadedFile.preview = objectUrl;
-                objectUrlsRef.current.push(objectUrl);
+                if (file.size <= maxPreviewSizeMB * 1024 * 1024) {
+                    const objectUrl = URL.createObjectURL(file);
+                    uploadedFile.preview = objectUrl;
+                    objectUrlsRef.current.push(objectUrl);
+                } else {
+                    // No preview for large files; generic icon will be shown
+                    uploadedFile.preview = undefined;
+                }
             }
 
             newFiles.push(uploadedFile);
@@ -204,8 +212,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         });
 
         handleFormChange(updatedFiles, onChange);
-        // Allow the UI to paint the overlay; then end processing on next tick
-        requestAnimationFrame(() => setIsProcessing(false));
+        // End processing flag; overlay will remain visible if files are still uploading
     };
 
     const removeFile = (
@@ -282,14 +289,16 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         onChange?: (files: File[] | File | null) => void;
     }) => (
         <div className={`space-y-4 ${className}`}>
-            {isProcessing && (
+            {/* {(isProcessing || uploadedFiles.some((f) => f.status === "uploading")) && (
                 <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center">
                     <div className="bg-white rounded-lg shadow p-4 flex items-center gap-3">
                         <div className="animate-spin rounded-full h-6 w-6 border-2 border-b-transparent border-blue-600" />
-                        <p className="text-gray-700 text-sm">Processing files...</p>
+                        <p className="text-gray-700 text-sm">
+                            {isProcessing ? "Processing files..." : "Uploading files..."}
+                        </p>
                     </div>
                 </div>
-            )}
+            )} */}
             {name && (
                 <label className="block text-sm font-medium text-gray-700">
                     {label}{" "}
@@ -366,9 +375,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                                     {uploadedFile.preview ? (
                                         <img
                                             src={uploadedFile.preview}
-                                            alt={uploadedFile.file?.name}
+                                            alt={uploadedFile.file?.name || "Preview"}
                                             className="w-10 h-10 object-cover rounded"
                                             loading="lazy"
+                                            decoding="async"
                                         />
                                     ) : uploadedFile.url ? (
                                         <img
@@ -376,30 +386,26 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                                             alt="Uploaded"
                                             className="w-10 h-10 object-cover rounded"
                                             loading="lazy"
+                                            decoding="async"
                                         />
-                                    ) : (
-                                        uploadedFile.file && (
-                                            <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
-                                                {getFileIcon(uploadedFile.file)}
-                                            </div>
-                                        )
-                                    )}
+                                    ) : uploadedFile.file ? (
+                                        <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
+                                            {getFileIcon(uploadedFile.file)}
+                                        </div>
+                                    ) : null}
                                 </div>
 
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2">
                                         <p className="text-sm font-medium text-gray-900 truncate">
-                                            {uploadedFile.file?.name ||
-                                                uploadedFile.url}
+                                            {uploadedFile.file?.name || uploadedFile.url}
                                         </p>
                                         {getStatusIcon(uploadedFile.status)}
                                     </div>
 
                                     {uploadedFile.file && (
                                         <p className="text-xs text-gray-500">
-                                            {formatFileSize(
-                                                uploadedFile.file.size
-                                            )}
+                                            {formatFileSize(uploadedFile.file.size)}
                                         </p>
                                     )}
 
@@ -414,30 +420,23 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                                             <div className="w-full bg-gray-200 rounded-full h-1.5">
                                                 <div
                                                     className="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
-                                                    style={{
-                                                        width: `${uploadedFile.progress}%`,
-                                                    }}
+                                                    style={{ width: `${uploadedFile.progress}%` }}
                                                 />
                                             </div>
                                             <p className="text-xs text-gray-500 mt-1">
-                                                {Math.round(
-                                                    uploadedFile.progress
-                                                )}
-                                                % uploaded
+                                                {Math.round(uploadedFile.progress)}% uploaded
                                             </p>
                                         </div>
                                     )}
                                 </div>
 
                                 <div className="flex items-center gap-1">
-                                    {(uploadedFile.preview ||
-                                        uploadedFile.url) && (
+                                    {(uploadedFile.preview || uploadedFile.url) && (
                                         <button
                                             type="button"
                                             onClick={() =>
                                                 window.open(
-                                                    uploadedFile.preview ||
-                                                        uploadedFile.url,
+                                                    uploadedFile.preview || uploadedFile.url!,
                                                     "_blank"
                                                 )
                                             }

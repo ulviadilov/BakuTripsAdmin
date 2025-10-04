@@ -126,6 +126,7 @@ export default function TourCreate() {
     const { data, isPending } = useQuery({
         queryKey: [QUERY_KEYS.category],
         queryFn: categoryService.categeroySelect,
+        refetchOnWindowFocus: false,
     });
 
     const {
