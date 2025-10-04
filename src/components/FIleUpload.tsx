@@ -61,7 +61,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 }) => {
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
     const [isDragging, setIsDragging] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const objectUrlsRef = useRef<string[]>([]);
 
     useEffect(() => {
         if (initialUrls) {
@@ -159,6 +161,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         files: FileList | File[],
         onChange?: (files: File[] | File | null) => void
     ) => {
+        setIsProcessing(true);
         const fileArray = Array.from(files);
 
         if (uploadedFiles.length + fileArray.length > maxFiles) {
@@ -166,7 +169,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             return;
         }
 
-        const newFiles: UploadedFile[] = [];
+    const newFiles: UploadedFile[] = [];
 
         fileArray.forEach((file) => {
             const error = validateFile(file);
@@ -181,18 +184,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 error,
             };
 
+            // Use object URLs for previews to avoid large base64 memory and main-thread work
             if (isImageFile(file) && !error) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    setUploadedFiles((prev) =>
-                        prev.map((f) =>
-                            f.id === fileId
-                                ? { ...f, preview: e.target?.result as string }
-                                : f
-                        )
-                    );
-                };
-                reader.readAsDataURL(file);
+                const objectUrl = URL.createObjectURL(file);
+                uploadedFile.preview = objectUrl;
+                objectUrlsRef.current.push(objectUrl);
             }
 
             newFiles.push(uploadedFile);
@@ -208,6 +204,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         });
 
         handleFormChange(updatedFiles, onChange);
+        // Allow the UI to paint the overlay; then end processing on next tick
+        requestAnimationFrame(() => setIsProcessing(false));
     };
 
     const removeFile = (
@@ -215,6 +213,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         photoId?:string,
         onChange?: (files: File[] | File | null) => void
     ) => {
+        const removed = uploadedFiles.find((f) => f.id === fileId);
+        // Revoke object URL if we created one for preview
+        if (removed?.preview && removed.preview.startsWith("blob:")) {
+            try { URL.revokeObjectURL(removed.preview); } catch {}
+            objectUrlsRef.current = objectUrlsRef.current.filter((u) => u !== removed.preview);
+        }
         const updatedFiles = uploadedFiles.filter((f) => f.id !== fileId);
         if(Array.isArray(initialUrls) && onDelete){
             onDelete(photoId || "")
@@ -278,6 +282,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         onChange?: (files: File[] | File | null) => void;
     }) => (
         <div className={`space-y-4 ${className}`}>
+            {isProcessing && (
+                <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                    <div className="bg-white rounded-lg shadow p-4 flex items-center gap-3">
+                        <div className="animate-spin rounded-full h-6 w-6 border-2 border-b-transparent border-blue-600" />
+                        <p className="text-gray-700 text-sm">Processing files...</p>
+                    </div>
+                </div>
+            )}
             {name && (
                 <label className="block text-sm font-medium text-gray-700">
                     {label}{" "}
@@ -356,12 +368,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                                             src={uploadedFile.preview}
                                             alt={uploadedFile.file?.name}
                                             className="w-10 h-10 object-cover rounded"
+                                            loading="lazy"
                                         />
                                     ) : uploadedFile.url ? (
                                         <img
                                             src={uploadedFile.url}
                                             alt="Uploaded"
                                             className="w-10 h-10 object-cover rounded"
+                                            loading="lazy"
                                         />
                                     ) : (
                                         uploadedFile.file && (
@@ -468,6 +482,16 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             />
         );
     }
+
+    useEffect(() => {
+        // Cleanup all object URLs on unmount
+        return () => {
+            objectUrlsRef.current.forEach((u) => {
+                try { URL.revokeObjectURL(u); } catch {}
+            });
+            objectUrlsRef.current = [];
+        };
+    }, []);
 
     return <FileUploadContent />;
 };
