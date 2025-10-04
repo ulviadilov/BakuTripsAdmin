@@ -9,7 +9,7 @@ import { paths } from "../../constants/path";
 import Input from "../../components/Input";
 import { memberService } from "../../services/member";
 import Select from "../../components/Select";
-import { teamOptions, teamOptionsI18n } from "../../constants/team";
+import { teamOptions } from "../../constants/team";
 import { useState } from "react";
 import { otherLanguages } from "../../constants";
 

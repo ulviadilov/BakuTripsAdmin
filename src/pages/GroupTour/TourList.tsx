@@ -11,12 +11,11 @@ import { ErrorMessage } from "../../components/Error";
 import { Table } from "../../components/Table";
 import { DeleteConfirmationModal } from "../../components/Modal";
 
-
-const columns= [
+const columns = [
     {
         key: "name",
         label: "Tour Name",
-        type: "text"
+        type: "text" as const,
     },
     {
         key: "duration",
@@ -53,7 +52,7 @@ export default function TourList() {
 
     const { data, isLoading, isError, refetch } = useQuery({
         queryKey: [QUERY_KEYS.groupTour],
-        queryFn: () => groupTourService.getAllTours(0,10)
+        queryFn: () => groupTourService.getAllTours(0, 10),
     });
 
     const handleRetry = () => {
@@ -116,18 +115,18 @@ export default function TourList() {
     }
 
     const tours = data?.data?.grouptours;
-        const updatedItems = tours.map((tour:TourFormData) => ({
-            ...tour,
-            isPopular: tour.isPopular ? (
-                <span className="bg-green-500 py-1 px-2.5 rounded-3xl text-white">
-                    Popular
-                </span>
-            ) : (
-                <span className="bg-red-500 py-1 px-2.5 rounded-3xl text-white">
-                    Not Popular
-                </span>
-            ),
-        }));
+    const updatedItems = tours.map((tour: TourFormData) => ({
+        ...tour,
+        isPopular: tour.isPopular ? (
+            <span className="bg-green-500 py-1 px-2.5 rounded-3xl text-white">
+                Popular
+            </span>
+        ) : (
+            <span className="bg-red-500 py-1 px-2.5 rounded-3xl text-white">
+                Not Popular
+            </span>
+        ),
+    }));
 
     return (
         <>

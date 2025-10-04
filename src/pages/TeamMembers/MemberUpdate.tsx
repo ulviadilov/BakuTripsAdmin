@@ -11,7 +11,7 @@ import { QUERY_KEYS } from "../../constants/queryKeys";
 import { useEffect, useState } from "react";
 import Select from "../../components/Select";
 import { memberService } from "../../services/member";
-import { teamOptions, teamOptionsI18n } from "../../constants/team";
+import { teamOptions } from "../../constants/team";
 import { otherLanguages } from "../../constants";
 
 interface MemberFormData {
