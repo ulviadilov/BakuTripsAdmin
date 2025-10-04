@@ -3,7 +3,7 @@ import { paths } from "../constants/path";
 
 export const apiClient = axios.create({
     baseURL: import.meta.env.VITE_APP_BASE_URL,
-    timeout: 10000,
+    timeout: 20000,
     maxBodyLength: Infinity,
     headers: {
         "Content-Type": "application/json",
