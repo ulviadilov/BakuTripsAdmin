@@ -11,12 +11,9 @@ import { memberService } from "../../services/member";
 import Select from "../../components/Select";
 import { teamOptions, teamOptionsI18n } from "../../constants/team";
 import { useState } from "react";
+import { otherLanguages } from "../../constants";
 
 const defaultLanguage = { code: "en", name: "English" };
-const otherLanguages = [
-    { code: "az", name: "Azərbaycan" },
-    { code: "ru", name: "Русский" },
-];
 
 const schema = yup.object({
     firstname: yup.string().required("First name is required"),
@@ -32,11 +29,11 @@ const schema = yup.object({
             yup
                 .object({
                     languageCode: yup.string().required(),
-                    firstname: yup.string().required("First name is required"),
-                    lastname: yup.string().required("Last name is required"),
-                    description: yup.string().required("Description is required"),
+
+                    description: yup
+                        .string()
+                        .required("Description is required"),
                     position: yup.string().required("Position is required"),
-            team: yup.string().required("Team is required"),
                 })
                 .required()
         )
@@ -52,7 +49,7 @@ export default function MemberCreate() {
         control,
         handleSubmit,
         reset,
-        formState: { errors }
+        formState: { errors },
     } = useForm<MemberFormType>({
         resolver: yupResolver(schema),
         defaultValues: {
@@ -65,13 +62,10 @@ export default function MemberCreate() {
             lastname: "",
             translations: otherLanguages.map((lang) => ({
                 languageCode: lang.code,
-                firstname: "",
-                lastname: "",
                 description: "",
                 position: "",
-                team: "",
             })),
-        }
+        },
     });
 
     const { fields } = useFieldArray({ control, name: "translations" });
@@ -85,14 +79,16 @@ export default function MemberCreate() {
     const mutation = useMutation({
         mutationFn: memberService.memberCreate,
         onSuccess: () => {
-            toast.success('Member created successfully');
+            toast.success("Member created successfully");
             reset();
             navigate(paths.MEMBER.LIST);
         },
         onError: (error: any) => {
             console.error(error);
-            toast.error(error.response?.data?.message || 'Failed to create Member');
-        }
+            toast.error(
+                error.response?.data?.message || "Failed to create Member"
+            );
+        },
     });
 
     const onSubmit = async (data: MemberFormType) => {
@@ -112,13 +108,27 @@ export default function MemberCreate() {
                         className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                         title="Go back"
                     >
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        <svg
+                            className="w-5 h-5 text-gray-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 19l-7-7 7-7"
+                            />
                         </svg>
                     </button>
                     <div>
-                        <h1 className="text-2xl font-semibold text-gray-900">Create Member</h1>
-                        <p className="text-gray-600 text-sm mt-1">Add a new team member</p>
+                        <h1 className="text-2xl font-semibold text-gray-900">
+                            Create Member
+                        </h1>
+                        <p className="text-gray-600 text-sm mt-1">
+                            Add a new team member
+                        </p>
                     </div>
                 </div>
             </div>
@@ -212,18 +222,26 @@ export default function MemberCreate() {
                     {/* Translations Tabs */}
                     {otherLanguages.length > 0 && (
                         <div className="pt-4 border-t border-gray-200">
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Translations</h3>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                Translations
+                            </h3>
                             <div className="border-b border-gray-200">
-                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                <nav
+                                    className="-mb-px flex space-x-8"
+                                    aria-label="Tabs"
+                                >
                                     {otherLanguages.map((lang) => (
                                         <button
                                             key={lang.code}
                                             type="button"
-                                            onClick={() => setActiveLang(lang.code)}
-                                            className={`${activeLang === lang.code
-                                                ? "border-slate-500 text-slate-600"
-                                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                            onClick={() =>
+                                                setActiveLang(lang.code)
+                                            }
+                                            className={`${
+                                                activeLang === lang.code
+                                                    ? "border-slate-500 text-slate-600"
+                                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
                                         >
                                             {lang.name}
                                         </button>
@@ -235,38 +253,15 @@ export default function MemberCreate() {
                                 {fields.map((field, index) => (
                                     <div
                                         key={field.id}
-                                        style={{ display: activeLang === field.languageCode ? "block" : "none" }}
+                                        style={{
+                                            display:
+                                                activeLang ===
+                                                field.languageCode
+                                                    ? "block"
+                                                    : "none",
+                                        }}
                                     >
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <Input
-                                                name={`translations.${index}.firstname`}
-                                                control={control}
-                                                label="First Name"
-                                                type="text"
-                                                placeholder="Enter first name"
-                                                required={true}
-                                                error={errors.translations?.[index]?.firstname?.message}
-                                            />
-                                            <Input
-                                                name={`translations.${index}.lastname`}
-                                                control={control}
-                                                label="Last Name"
-                                                type="text"
-                                                placeholder="Enter last name"
-                                                required={true}
-                                                error={errors.translations?.[index]?.lastname?.message}
-                                            />
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                                            <Select
-                                                name={`translations.${index}.team`}
-                                                control={control}
-                                                label="Team"
-                                                placeholder="Select team"
-                                                required={true}
-                                                error={errors.translations?.[index]?.team?.message}
-                                                options={teamOptionsI18n[(fields[index] as any).languageCode as "az" | "ru"]}
-                                            />
+                                        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mt-6">
                                             <Input
                                                 name={`translations.${index}.position`}
                                                 control={control}
@@ -274,7 +269,10 @@ export default function MemberCreate() {
                                                 type="text"
                                                 placeholder="Enter position"
                                                 required={true}
-                                                error={errors.translations?.[index]?.position?.message}
+                                                error={
+                                                    errors.translations?.[index]
+                                                        ?.position?.message
+                                                }
                                             />
                                         </div>
                                         <div className="grid grid-cols-1 mt-6">
@@ -285,7 +283,10 @@ export default function MemberCreate() {
                                                 type="textarea"
                                                 placeholder="Enter member description"
                                                 required={true}
-                                                error={errors.translations?.[index]?.description?.message}
+                                                error={
+                                                    errors.translations?.[index]
+                                                        ?.description?.message
+                                                }
                                             />
                                         </div>
                                     </div>
@@ -303,16 +304,42 @@ export default function MemberCreate() {
                         >
                             {mutation.isPending ? (
                                 <>
-                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    <svg
+                                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
                                     </svg>
                                     Creating...
                                 </>
                             ) : (
                                 <>
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M12 4v16m8-8H4"
+                                        />
                                     </svg>
                                     Create Member
                                 </>

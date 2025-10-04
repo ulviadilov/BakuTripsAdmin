@@ -9,6 +9,11 @@ export interface RequestDestination{
     Translations?: DestinationTranslation[];
 }
 
+export enum RequestDestinationEnum{
+    tourId="tourId",
+    displayOrder="displayOrder",
+}
+
 export interface DestinationTranslation {
     languageCode: string;
     name: string;

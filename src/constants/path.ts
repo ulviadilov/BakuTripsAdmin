@@ -180,20 +180,9 @@ export const navItems = [
     { label: "Destinations", icon: MapPin, path: paths.DESTINATION.LIST },
     { label: "Categories", icon: Puzzle, path: paths.CATEGORY.LIST },
     {
-        label: "Settings",
-        icon: Settings,
-        children: [
-            {
-                label: "Contact",
-                icon: Contact,
-                path: paths.SETTING.CONTACT.LIST,
-            },
-            {
-                label: "Social Medias",
-                icon: Share2,
-                path: paths.SETTING.SOCIAL.LIST,
-            },
-        ],
+        label: "Contact",
+        icon: Contact,
+        path: paths.SETTING.CONTACT.LIST,
     },
     { label: "User", icon: UserCircle, path: paths.USER.LIST },
 ];

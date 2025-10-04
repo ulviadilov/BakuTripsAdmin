@@ -11,11 +11,12 @@ import { ErrorMessage } from "../../components/Error";
 import { Table } from "../../components/Table";
 import { DeleteConfirmationModal } from "../../components/Modal";
 
-const columns = [
+
+const columns= [
     {
         key: "name",
         label: "Tour Name",
-        type: "text" as const,
+        type: "text"
     },
     {
         key: "duration",

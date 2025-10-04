@@ -123,7 +123,7 @@ export default function TourUpdate() {
             posterImageFile: null,
             vrimagefile: null,
             tourImages: [],
-            Translations: otherLanguages.map((l) => ({
+            translations: otherLanguages.map((l) => ({
                 languageCode: l.code,
                 name: "",
                 duration: "",
@@ -139,7 +139,7 @@ export default function TourUpdate() {
 
     const { fields: translationFields } = useFieldArray({
         control,
-        name: "Translations",
+        name: "translations",
     });
     const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || "az");
 
@@ -149,7 +149,7 @@ export default function TourUpdate() {
     useEffect(() => {
         if (tourData?.data?.grouptour) {
             const tour = tourData?.data?.grouptour;
-            const serverTranslations: GroupTourTranslation[] = (tour.Translations || []).map((t: any) => ({
+            const serverTranslations: GroupTourTranslation[] = (tour.translations || []).map((t: any) => ({
                 languageCode: t.languageCode,
                 name: t.name ?? "",
                 duration: t.duration ?? "",
@@ -185,7 +185,7 @@ export default function TourUpdate() {
                 posterImageFile: null,
                 vrimagefile: null,
                 tourImages: [],
-                Translations: otherLanguages.map((l) =>
+                translations: otherLanguages.map((l) =>
                     translationsByLang[l.code] || {
                         languageCode: l.code,
                         name: "",
@@ -761,7 +761,7 @@ export default function TourUpdate() {
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-medium text-gray-700">Short Description ({otherLanguages[idx]?.code.toUpperCase()})</label>
                                                 <Controller
-                                                    name={`Translations.${idx}.shortDescription`}
+                                                    name={`translations.${idx}.shortDescription`}
                                                     control={control}
                                                     render={({ field }) => (
                                                         <textarea {...field} rows={3} placeholder="Enter short description" className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500" />
@@ -771,7 +771,7 @@ export default function TourUpdate() {
                                             <div className="space-y-2">
                                                 <label className="block text-sm font-medium text-gray-700">Full Description ({otherLanguages[idx]?.code.toUpperCase()})</label>
                                                 <Controller
-                                                    name={`Translations.${idx}.fullDescription`}
+                                                    name={`translations.${idx}.fullDescription`}
                                                     control={control}
                                                     render={({ field }) => (
                                                         <textarea {...field} rows={6} placeholder="Enter full description" className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500" />
@@ -780,25 +780,25 @@ export default function TourUpdate() {
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <ArrayInput
-                                                    name={`Translations.${idx}.includes`}
+                                                    name={`translations.${idx}.includes`}
                                                     control={control}
                                                     label={`Includes (${otherLanguages[idx]?.code.toUpperCase()})`}
                                                     placeholder="Add what's included..."
                                                 />
                                                 <ArrayInput
-                                                    name={`Translations.${idx}.excludes`}
+                                                    name={`translations.${idx}.excludes`}
                                                     control={control}
                                                     label={`Excludes (${otherLanguages[idx]?.code.toUpperCase()})`}
                                                     placeholder="Add what's excluded..."
                                                 />
                                                 <ArrayInput
-                                                    name={`Translations.${idx}.importantInfos`}
+                                                    name={`translations.${idx}.importantInfos`}
                                                     control={control}
                                                     label={`Important Information (${otherLanguages[idx]?.code.toUpperCase()})`}
                                                     placeholder="Add important info..."
                                                 />
                                                 <ArrayInput
-                                                    name={`Translations.${idx}.tourPrograms`}
+                                                    name={`translations.${idx}.tourPrograms`}
                                                     control={control}
                                                     label={`Tour Programs (${otherLanguages[idx]?.code.toUpperCase()})`}
                                                     placeholder="Add tour program..."

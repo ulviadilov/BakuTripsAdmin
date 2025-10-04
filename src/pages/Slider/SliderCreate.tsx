@@ -9,12 +9,10 @@ import { paths } from "../../constants/path";
 import Input from "../../components/Input";
 import { sliderService } from "../../services/slider";
 import { useNavigate } from "react-router";
+import { otherLanguages } from "../../constants";
 
 const defaultLanguage = { code: "en", name: "English" };
-const otherLanguages = [
-    { code: "az", name: "Azərbaycan" },
-    { code: "ru", name: "Русский" },
-];
+
 
 const schema = yup.object({
     displayOrder: yup.string().required("Display Order is required"),

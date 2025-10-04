@@ -26,12 +26,15 @@ const memberCreate = async (data: MemberRequest) => {
     }
     if (data.translations && data.translations.length > 0) {
         data.translations.forEach((tr, index) => {
-            formData.append(`translations[${index}].languageCode`, tr.languageCode);
-            formData.append(`translations[${index}].firstname`, tr.firstname);
-            formData.append(`translations[${index}].lastname`, tr.lastname);
-            formData.append(`translations[${index}].description`, tr.description);
+            formData.append(
+                `translations[${index}].languageCode`,
+                tr.languageCode
+            );
+            formData.append(
+                `translations[${index}].description`,
+                tr.description
+            );
             formData.append(`translations[${index}].position`, tr.position);
-            formData.append(`translations[${index}].team`, tr.team);
         });
     }
 
@@ -42,7 +45,7 @@ const memberCreate = async (data: MemberRequest) => {
     });
 };
 
-const getAllMembers = async (page:number = 0,size:number = 10) => {
+const getAllMembers = async (page: number = 0, size: number = 10) => {
     return await apiClient.get(`/TeamMembers?page=${page}&size=${size}`);
 };
 
@@ -76,12 +79,15 @@ const updateMember = async (id: string, data: MemberRequestUpdate) => {
     }
     if (data.translations && data.translations.length > 0) {
         data.translations.forEach((tr, index) => {
-            formData.append(`translations[${index}].languageCode`, tr.languageCode);
-            formData.append(`translations[${index}].firstname`, tr.firstname);
-            formData.append(`translations[${index}].lastname`, tr.lastname);
-            formData.append(`translations[${index}].description`, tr.description);
+            formData.append(
+                `translations[${index}].languageCode`,
+                tr.languageCode
+            );
+            formData.append(
+                `translations[${index}].description`,
+                tr.description
+            );
             formData.append(`translations[${index}].position`, tr.position);
-            formData.append(`translations[${index}].team`, tr.team);
         });
     }
 

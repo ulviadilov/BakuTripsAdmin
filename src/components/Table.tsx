@@ -10,7 +10,7 @@ import {
 import classNames from "classnames";
 import Tooltip from "@mui/material/Tooltip";
 
-interface TableColumn {
+export interface TableColumn {
     key: string;
     label: string;
     width?: string;

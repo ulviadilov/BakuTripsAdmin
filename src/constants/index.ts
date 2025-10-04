@@ -1,4 +1,5 @@
 export const otherLanguages = [
-    { code: "az", name: "Azərbaycan" },
+    { code: "zh", name: "中文" },
+    { code: "es", name: "Español" },
     { code: "ru", name: "Русский" },
 ];

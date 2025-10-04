@@ -1,13 +1,10 @@
 export interface MemberTranslation {
     languageCode: string;
-    firstname: string;
-    lastname: string;
     description: string;
     position: string;
-    team: string;
 }
 
-export interface MemberRequest{
+export interface MemberRequest {
     firstname: string;
     lastname: string;
     team: string;
@@ -18,7 +15,7 @@ export interface MemberRequest{
     translations?: MemberTranslation[];
 }
 
-export interface MemberRequestUpdate{
+export interface MemberRequestUpdate {
     firstname: string;
     lastname: string;
     team: string;

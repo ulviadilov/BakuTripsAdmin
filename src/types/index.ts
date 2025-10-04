@@ -48,7 +48,7 @@ export interface TourFormDataGet {
     vrimagefile: File | null ;
     tourImages: {id:string;imagePath:string}[] ;
     // Translated content per language (used only for Group Tours)
-    Translations?: GroupTourTranslation[];
+    translations?: GroupTourTranslation[];
 }
 export interface PackageTourOption {
   packageid: string;

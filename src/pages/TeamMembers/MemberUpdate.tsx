@@ -25,11 +25,8 @@ interface MemberFormData {
     translations: Array<{
         id?: string;
         languageCode: string;
-        firstname: string;
-        lastname: string;
         description: string;
         position: string;
-        team: string;
     }>;
 }
 
@@ -50,14 +47,11 @@ const schema = yup.object({
             yup
                 .object({
                     languageCode: yup.string().required(),
-                    firstname: yup.string().required("First name is required"),
-                    lastname: yup.string().required("Last name is required"),
                     description: yup
                         .string()
                         .required("Description is required")
                         .min(10, "Description must be at least 10 characters"),
                     position: yup.string().required("Position is required"),
-                    team: yup.string().required("Team is required"),
                 })
                 .required()
         )
@@ -95,11 +89,8 @@ export default function MemberUpdate() {
             hoverImage: null,
             translations: otherLanguages.map((lang) => ({
                 languageCode: lang.code,
-                firstname: "",
-                lastname: "",
                 description: "",
                 position: "",
-                team: "",
             })),
         },
     });
@@ -419,32 +410,6 @@ export default function MemberUpdate() {
                                                     : "none",
                                         }}
                                     >
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <Input
-                                                name={`translations.${index}.firstname`}
-                                                control={control}
-                                                label="First Name"
-                                                type="text"
-                                                placeholder="Enter first name"
-                                                required={true}
-                                                error={
-                                                    errors.translations?.[index]
-                                                        ?.firstname?.message
-                                                }
-                                            />
-                                            <Input
-                                                name={`translations.${index}.lastname`}
-                                                control={control}
-                                                label="Last Name"
-                                                type="text"
-                                                placeholder="Enter last name"
-                                                required={true}
-                                                error={
-                                                    errors.translations?.[index]
-                                                        ?.lastname?.message
-                                                }
-                                            />
-                                        </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                                             <Input
                                                 name={`translations.${index}.position`}
@@ -456,25 +421,6 @@ export default function MemberUpdate() {
                                                 error={
                                                     errors.translations?.[index]
                                                         ?.position?.message
-                                                }
-                                            />
-                                            <Select
-                                                name={`translations.${index}.team`}
-                                                control={control}
-                                                label="Team"
-                                                placeholder="Select team"
-                                                required={true}
-                                                error={
-                                                    errors.translations?.[index]
-                                                        ?.team?.message
-                                                }
-                                                options={
-                                                    teamOptionsI18n[
-                                                        (fields[index] as any)
-                                                            .languageCode as
-                                                            | "az"
-                                                            | "ru"
-                                                    ]
                                                 }
                                             />
                                         </div>
