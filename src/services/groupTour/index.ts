@@ -1,4 +1,4 @@
-import type {TourFormDataGet } from "../../types";
+import type { TourFormDataGet } from "../../types";
 import { apiClient } from "../../utils/axiosInstance";
 
 const createTour = async (payload: any) => {
@@ -72,17 +72,31 @@ const updateTour = async (
     });
 
     // Append Translations (capital T) if provided
-    if (data.Translations && data.Translations.length > 0) {
-        data.Translations.forEach((tr, i) => {
+    if (data.translations && data.translations.length > 0) {
+        data.translations.forEach((tr, i) => {
             formData.append(`Translations[${i}].languageCode`, tr.languageCode);
             formData.append(`Translations[${i}].name`, tr.name);
             formData.append(`Translations[${i}].duration`, tr.duration);
-            formData.append(`Translations[${i}].shortDescription`, tr.shortDescription);
-            formData.append(`Translations[${i}].fullDescription`, tr.fullDescription);
-            tr.includes?.forEach((val, j) => formData.append(`Translations[${i}].includes[${j}]`, val));
-            tr.excludes?.forEach((val, j) => formData.append(`Translations[${i}].excludes[${j}]`, val));
-            tr.importantInfos?.forEach((val, j) => formData.append(`Translations[${i}].importantInfos[${j}]`, val));
-            tr.tourPrograms?.forEach((val, j) => formData.append(`Translations[${i}].tourPrograms[${j}]`, val));
+            formData.append(
+                `Translations[${i}].shortDescription`,
+                tr.shortDescription
+            );
+            formData.append(
+                `Translations[${i}].fullDescription`,
+                tr.fullDescription
+            );
+            tr.includes?.forEach((val, j) =>
+                formData.append(`Translations[${i}].includes[${j}]`, val)
+            );
+            tr.excludes?.forEach((val, j) =>
+                formData.append(`Translations[${i}].excludes[${j}]`, val)
+            );
+            tr.importantInfos?.forEach((val, j) =>
+                formData.append(`Translations[${i}].importantInfos[${j}]`, val)
+            );
+            tr.tourPrograms?.forEach((val, j) =>
+                formData.append(`Translations[${i}].tourPrograms[${j}]`, val)
+            );
         });
     }
     return apiClient.put(`GroupTours/${id}`, formData, {

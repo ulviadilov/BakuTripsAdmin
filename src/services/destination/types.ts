@@ -1,4 +1,4 @@
-export interface RequestDestination{
+export interface RequestDestination {
     tourId: string;
     displayOrder: string;
     name: string;
@@ -7,11 +7,6 @@ export interface RequestDestination{
     imageFile?: File | null;
     // Capital Translations for backend
     Translations?: DestinationTranslation[];
-}
-
-export enum RequestDestinationEnum{
-    tourId="tourId",
-    displayOrder="displayOrder",
 }
 
 export interface DestinationTranslation {
