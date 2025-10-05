@@ -23,9 +23,9 @@ const columns = [
         type: "text" as const,
     },
     {
-        key:"basePrice",
-        label:"Base Price",
-        type:"text" as const
+        key: "basePrice",
+        label: "Base Price",
+        type: "text" as const
     },
     {
         key: "posterImagePath",
@@ -42,6 +42,18 @@ export default function TourList() {
         navigate(paths.PACKAGE_TOUR_PACKAGE.CREATE); // Adjust path as needed
     };
 
+    const [paginationData, setPaginationData] = useState({
+        skip: 0,
+        take: 10,
+    });
+
+    const handlePageChange = (skip: number, take: number) => {
+        setPaginationData({
+            skip: skip || 0,
+            take: take || 10,
+        });
+    }
+
     const [deleteModal, setDeleteModal] = useState<{
         isOpen: boolean;
         name: any;
@@ -51,8 +63,8 @@ export default function TourList() {
     });
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.package],
-        queryFn: () => packageTourService.getAllPackages(0,10)
+        queryKey: [QUERY_KEYS.package, paginationData],
+        queryFn: () => packageTourService.getAllPackages(paginationData.skip, paginationData.take)
     });
 
     const handleRetry = () => {
@@ -112,18 +124,25 @@ export default function TourList() {
     }
 
     const tours = data?.data?.travelPackages;
-        const updatedItems = tours.map((tour:TourFormData) => ({
-            ...tour,
-            isPopular: tour.isPopular ? (
-                <span className="bg-green-500 py-1 px-2.5 rounded-3xl text-white">
-                    Popular
-                </span>
-            ) : (
-                <span className="bg-red-500 py-1 px-2.5 rounded-3xl text-white">
-                    Not Popular
-                </span>
-            ),
-        }));
+    const totalCount = data?.data?.totalCount || 0;
+    const updatedItems = tours.map((tour: TourFormData) => ({
+        ...tour,
+        isPopular: tour.isPopular ? (
+            <span className="bg-green-500 py-1 px-2.5 rounded-3xl text-white">
+                Popular
+            </span>
+        ) : (
+            <span className="bg-red-500 py-1 px-2.5 rounded-3xl text-white">
+                Not Popular
+            </span>
+        ),
+    }));
+
+    const paginationProps = {
+        totalCount: totalCount,
+        skip: paginationData.skip,
+        take: paginationData.take,
+    };
 
     return (
         <>
@@ -136,11 +155,8 @@ export default function TourList() {
                     title="Packages"
                     actions={true}
                     columns={columns}
-                    pagination={{
-                        totalCount: data?.data.totalCount || 0,
-                        skip: 0,
-                        take: 10,
-                    }}
+                    pagination={paginationProps}
+                    onPageChange={handlePageChange}
                     onCreate={handleCreate}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
