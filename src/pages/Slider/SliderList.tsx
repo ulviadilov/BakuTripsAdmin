@@ -54,7 +54,7 @@ export default function SliderList() {
     };
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.slider.all],
+        queryKey: [QUERY_KEYS.slider.all, paginationData],
         queryFn: () => sliderService.getAll(paginationData.skip,paginationData.take),
     });
     const [deleteModal, setDeleteModal] = useState<{

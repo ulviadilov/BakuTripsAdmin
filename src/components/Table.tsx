@@ -80,12 +80,13 @@ const TableImage: React.FC<{
         setImageLoading(false);
     };
 
+    
+
     if (!src || imageError) {
         return (
             <div
-                className={`${getSizeClasses()} bg-gray-100 rounded-${
-                    type === "avatar" ? "full" : "lg"
-                } flex items-center justify-center`}
+                className={`${getSizeClasses()} bg-gray-100 rounded-${type === "avatar" ? "full" : "lg"
+                    } flex items-center justify-center`}
             >
                 {fallbackText ? (
                     <span className="text-xs font-medium text-gray-500 uppercase">
@@ -102,9 +103,8 @@ const TableImage: React.FC<{
         <div className={`${getSizeClasses()} relative`}>
             {imageLoading && (
                 <div
-                    className={`${getSizeClasses()} bg-gray-100 rounded-${
-                        type === "avatar" ? "full" : "lg"
-                    } animate-pulse absolute inset-0`}
+                    className={`${getSizeClasses()} bg-gray-100 rounded-${type === "avatar" ? "full" : "lg"
+                        } animate-pulse absolute inset-0`}
                 />
             )}
             <img
@@ -112,11 +112,9 @@ const TableImage: React.FC<{
                 alt={alt}
                 onLoad={handleImageLoad}
                 onError={handleImageError}
-                className={`${getSizeClasses()} object-cover rounded-${
-                    type === "avatar" ? "full" : "lg"
-                } ${
-                    imageLoading ? "opacity-0" : "opacity-100"
-                } transition-opacity duration-200`}
+                className={`${getSizeClasses()} object-cover rounded-${type === "avatar" ? "full" : "lg"
+                    } ${imageLoading ? "opacity-0" : "opacity-100"
+                    } transition-opacity duration-200`}
             />
         </div>
     );
@@ -128,12 +126,40 @@ const TableCell: React.FC<{
     row: TableRow;
 }> = ({ column, value, row }) => {
     const { type = "text", imageSize = "medium", fallbackText } = column;
+    // If caller passed a React element (or array of elements), render it as-is
+    if (React.isValidElement(value)) {
+        return <>{value}</>;
+    }
+    if (Array.isArray(value) && value.every((v) => React.isValidElement(v))) {
+        return <>{value}</>;
+    }
+    // Detect price-like columns by key or label
+    const isPriceColumn = /price/i.test(column.key) || /price/i.test(column.label);
 
-    const shouldTruncate =
-        type === "text" && typeof value === "string" && value.length > 100;
+    // Build the display string used in text cells
+    let displayValue: any = value;
+    if (type === "text" && isPriceColumn) {
+        if (displayValue !== null && displayValue !== undefined && displayValue !== "") {
+            if (typeof displayValue === "string") {
+                const trimmed = displayValue.trim();
+                displayValue = trimmed.startsWith("$") ? trimmed : `$${trimmed}`;
+            } else if (typeof displayValue === "number") {
+                displayValue = `$${displayValue}`;
+            } else {
+                // Fallback stringify for unusual types
+                const s = String(displayValue);
+                displayValue = s.startsWith("$") ? s : `$${s}`;
+            }
+        }
+    }
+
+    const displayStr =
+        typeof displayValue === "string" ? displayValue : String(displayValue ?? "");
+
+    const shouldTruncate = type === "text" && displayStr.length > 100;
     const truncatedText = shouldTruncate
-        ? `${value.substring(0, 60)}...`
-        : value;
+        ? `${displayStr.substring(0, 60)}...`
+        : displayStr;
 
     switch (type) {
         case "image":
@@ -158,7 +184,7 @@ const TableCell: React.FC<{
         case "text":
         default:
             return (
-                <Tooltip title={value}>
+                <Tooltip title={displayStr}>
                     <div className="flex items-center relative">
                         {truncatedText}
                     </div>

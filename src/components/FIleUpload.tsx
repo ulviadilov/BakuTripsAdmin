@@ -22,6 +22,10 @@ interface UploadedFile {
     photoId:string;
     progress: number;
     error?: string | null;
+    // When true, don't render an inline <img> preview (e.g., because remote size too large)
+    noPreview?: boolean;
+    // For remote URLs, store detected size in bytes (if discovered)
+    remoteBytes?: number;
 }
 
 interface FileUploadProps {
@@ -31,6 +35,8 @@ interface FileUploadProps {
     maxFiles?: number;
     // Maximum file size (in MB) to generate an inline preview for. Larger files will skip preview to avoid UI freezes.
     maxPreviewSizeMB?: number;
+    // Maximum size (in MB) for showing inline preview of initial URL images
+    maxInitialPreviewSizeMB?: number;
     onFilesChange?: (files: File[] | string | string[] | null | File) => void;
     className?: string;
     label?: string;
@@ -50,6 +56,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     maxSize = 10,
     maxFiles = 5,
     maxPreviewSizeMB = 8,
+    maxInitialPreviewSizeMB,
     onFilesChange,
     className = "",
     label = "Upload Files",
@@ -66,6 +73,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const objectUrlsRef = useRef<string[]>([]);
+    // Cache processed initial URLs to avoid repeated size checks
+    const processedInitialUrlsRef = useRef<Record<string, boolean>>({});
+
+    const initialPreviewLimitMB = (typeof maxInitialPreviewSizeMB === "number" ? maxInitialPreviewSizeMB : maxPreviewSizeMB);
 
     useEffect(() => {
         if (initialUrls) {
@@ -94,6 +105,56 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
         }
     }, [initialUrls]);
+
+    // Best-effort remote size detection for initial URL images to decide preview suppression.
+    useEffect(() => {
+        let cancelled = false;
+        const urlsToCheck = uploadedFiles.filter(f => !!f.url && f.file === undefined);
+        if (urlsToCheck.length === 0) return;
+
+        const getRemoteFileSize = async (url: string): Promise<number | null> => {
+            try {
+                // Attempt HEAD to get Content-Length
+                const head = await fetch(url, { method: "HEAD" });
+                const len = head.headers.get("content-length") || head.headers.get("Content-Length");
+                if (len) {
+                    const n = parseInt(len, 10);
+                    return Number.isFinite(n) ? n : null;
+                }
+            } catch {}
+            try {
+                // Fallback: Range request to get total size from Content-Range
+                const res = await fetch(url, { method: "GET", headers: { Range: "bytes=0-0" } });
+                const cr = res.headers.get("content-range") || res.headers.get("Content-Range");
+                if (cr && cr.includes("/")) {
+                    const totalStr = cr.split("/")[1];
+                    const total = parseInt(totalStr, 10);
+                    return Number.isFinite(total) ? total : null;
+                }
+            } catch {}
+            return null;
+        };
+
+        const check = async () => {
+            await Promise.all(urlsToCheck.map(async (f) => {
+                const url = f.url!;
+                if (processedInitialUrlsRef.current[url]) return;
+                processedInitialUrlsRef.current[url] = true;
+                const bytes = await getRemoteFileSize(url);
+                if (cancelled) return;
+                if (bytes !== null && bytes > initialPreviewLimitMB * 1024 * 1024) {
+                    setUploadedFiles(prev => prev.map(x => x.id === f.id ? { ...x, noPreview: true, remoteBytes: bytes } : x));
+                } else if (bytes !== null) {
+                    setUploadedFiles(prev => prev.map(x => x.id === f.id ? { ...x, remoteBytes: bytes } : x));
+                }
+            }));
+        };
+
+        void check();
+        return () => { cancelled = true; };
+        // Only depend on uploadedFiles array length/identity; thresholds change should also trigger
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [uploadedFiles, initialPreviewLimitMB]);
 
     // console.log(uploadedFiles);
 
@@ -379,7 +440,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                                             loading="lazy"
                                             decoding="async"
                                         />
-                                    ) : uploadedFile.url ? (
+                                    ) : uploadedFile.url && !uploadedFile.noPreview ? (
                                         <img
                                             src={uploadedFile.url}
                                             alt="Uploaded"
@@ -387,6 +448,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                                             loading="lazy"
                                             decoding="async"
                                         />
+                                    ) : uploadedFile.url && uploadedFile.noPreview ? (
+                                        <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center" title={`Preview disabled${uploadedFile.remoteBytes ? ` (> ${formatFileSize(uploadedFile.remoteBytes)})` : " due to size"}`}>
+                                            <ImageIcon className="w-5 h-5 text-gray-500" />
+                                        </div>
                                     ) : uploadedFile.file ? (
                                         <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
                                             {getFileIcon(uploadedFile.file)}
@@ -405,6 +470,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                                     {uploadedFile.file && (
                                         <p className="text-xs text-gray-500">
                                             {formatFileSize(uploadedFile.file.size)}
+                                        </p>
+                                    )}
+
+                                    {!uploadedFile.file && uploadedFile.noPreview && (
+                                        <p className="text-xs text-gray-500">
+                                            Preview hidden for large image {uploadedFile.remoteBytes ? `(${formatFileSize(uploadedFile.remoteBytes)})` : ""}
                                         </p>
                                     )}
 
@@ -445,6 +516,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                                             <Eye className="w-4 h-4" />
                                         </button>
                                     )}
+                                    {/* Hide open button when preview is intentionally suppressed */}
+                                    {(!uploadedFile.preview && uploadedFile.url && uploadedFile.noPreview) ? null : null}
 
                                     <button
                                         type="button"

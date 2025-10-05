@@ -60,8 +60,8 @@ export default function TourList() {
     });
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.privateTour.all], // Adjust query key as needed
-        queryFn: () => privateTourService.getAllTours(0, 10),
+        queryKey: [QUERY_KEYS.privateTour.all, paginationData], // Adjust query key as needed
+        queryFn: () => privateTourService.getAllTours(paginationData.skip, paginationData.take),
     });
 
     const handleRetry = () => {
@@ -91,7 +91,7 @@ export default function TourList() {
         }
     };
 
-    const handleRowClick =(row:RowType)=>{
+    const handleRowClick = (row: RowType) => {
         navigate(paths.PRIVATE_TOUR.DETAIL(row.id))
     }
 

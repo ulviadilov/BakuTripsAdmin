@@ -37,10 +37,21 @@ const columns = [
 export default function TourList() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const [paginationData, setPaginationData] = useState({
+        skip: 0,
+        take: 10,
+    });
 
     const handleCreate = () => {
         navigate(paths.GROUP_TOUR.CREATE); // Adjust path as needed
     };
+
+    const handlePageChange = (skip: number, take: number) => {
+        setPaginationData({
+            skip: skip || 0,
+            take: take || 10,
+        });
+    }
 
     const [deleteModal, setDeleteModal] = useState<{
         isOpen: boolean;
@@ -51,8 +62,8 @@ export default function TourList() {
     });
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.groupTour],
-        queryFn: () => groupTourService.getAllTours(0, 10),
+        queryKey: [QUERY_KEYS.groupTour, paginationData],
+        queryFn: () => groupTourService.getAllTours(paginationData.skip, paginationData.take),
     });
 
     const handleRetry = () => {
@@ -115,6 +126,13 @@ export default function TourList() {
     }
 
     const tours = data?.data?.grouptours;
+    const totalCount = data?.data?.totalCount || 0;
+
+    const paginationProps = {
+        totalCount: totalCount,
+        skip: paginationData.skip,
+        take: paginationData.take,
+    };
     const updatedItems = tours.map((tour: TourFormData) => ({
         ...tour,
         isPopular: tour.isPopular ? (
@@ -139,15 +157,12 @@ export default function TourList() {
                     title="Tours"
                     actions={true}
                     columns={columns}
-                    pagination={{
-                        totalCount: data?.data.totalCount || 0,
-                        skip: 0,
-                        take: 10,
-                    }}
                     onCreate={handleCreate}
                     onEdit={handleEdit}
                     onView={handleRowClick}
                     onDelete={handleDelete}
+                    onPageChange={handlePageChange}
+                    pagination={paginationProps}
                 />
             </div>
             <DeleteConfirmationModal

@@ -69,7 +69,7 @@ export default function PromoCodeList() {
     };
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.promoCode.all],
+        queryKey: [QUERY_KEYS.promoCode.all, paginationData],
         queryFn: () =>
             promoService.getAll(paginationData.skip, paginationData.take),
     });

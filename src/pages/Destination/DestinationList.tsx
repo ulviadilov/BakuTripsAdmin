@@ -60,8 +60,9 @@ export default function DestinationList() {
     });
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.destination.all],
-        queryFn: () => destinationService.getAll(0, 10),
+        queryKey: [QUERY_KEYS.destination.all, paginationData],
+        queryFn: () => destinationService.getAll(paginationData.skip, paginationData.take),
+
     });
 
     const handleRetry = () => {

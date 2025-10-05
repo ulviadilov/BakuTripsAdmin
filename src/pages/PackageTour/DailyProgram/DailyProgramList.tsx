@@ -23,6 +23,17 @@ const columns = [
 export default function DailyProgramList() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const [paginationData, setPaginationData] = useState({
+        skip: 0,
+        take: 10,
+    });
+
+    const handlePageChange = (skip: number, take: number) => {
+        setPaginationData({
+            skip: skip || 0,
+            take: take || 10,
+        });
+    }
 
     const handleCreate = () => {
         navigate(paths.PACKAGE_DAILY_PROGRAM.CREATE);
@@ -37,8 +48,8 @@ export default function DailyProgramList() {
     });
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.packageDailyProgram.all],
-        queryFn: () => dailyProgramService.getAllDailyPrograms(0, 10)
+        queryKey: [QUERY_KEYS.packageDailyProgram.all, paginationData],
+        queryFn: () => dailyProgramService.getAllDailyPrograms(paginationData.skip, paginationData.take)
     });
 
     const handleRetry = () => {
@@ -98,6 +109,12 @@ export default function DailyProgramList() {
     }
 
     const programs = data?.data?.dailyPrograms;
+    const totalCount = data?.data?.totalCount || 0;
+    const paginationProps = {
+        totalCount: totalCount,
+        skip: paginationData.skip,
+        take: paginationData.take,
+    };
 
     return (
         <>
@@ -110,11 +127,8 @@ export default function DailyProgramList() {
                     title="Daily Programs"
                     actions={true}
                     columns={columns}
-                    pagination={{
-                        totalCount: data?.data.totalCount || 0,
-                        skip: 0,
-                        take: 10,
-                    }}
+                    pagination={paginationProps}
+                    onPageChange={handlePageChange}
                     onCreate={handleCreate}
                     onEdit={handleEdit}
                     onDelete={handleDelete}

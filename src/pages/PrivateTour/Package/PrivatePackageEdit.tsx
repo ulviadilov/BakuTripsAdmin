@@ -56,11 +56,13 @@ export default function PrivatePackageEdit() {
             const serverTranslations = packageData.data?.translations || packageData.data?.privateTourPackage?.translations || [];
             const translationsByLang: Record<string, string> = {};
             serverTranslations.forEach((tr: any) => {
-                if (tr.languageCode && tr.vehicleinfo !== undefined) {
-                    translationsByLang[tr.languageCode] = tr.vehicleinfo;
+                if (tr.languageCode && tr.vehicleInfo !== undefined) {
+                    translationsByLang[tr.languageCode] = tr.vehicleInfo;
                 }
             });
 
+            console.log(translationsByLang);
+            
             reset({
                 tourid: packageData.data?.privateTourPackage.tourId || '',
                 vehicleinfo: packageData.data?.privateTourPackage.vehicleInfo || '',

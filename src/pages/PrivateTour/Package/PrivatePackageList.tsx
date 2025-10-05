@@ -56,8 +56,8 @@ export default function PrivatePackageList() {
     });
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.privateTour.packages],
-        queryFn: () => privateTourService.getAllPrivatePackages(0, 10),
+        queryKey: [QUERY_KEYS.privateTour.packages, paginationData],
+        queryFn: () => privateTourService.getAllPrivatePackages(paginationData.skip, paginationData.take),
     });
 
     const handleRetry = () => {

@@ -70,8 +70,8 @@ export default function MemberList() {
     };
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.member.all],
-        queryFn: () => memberService.getAllMembers(0, 10),
+        queryKey: [QUERY_KEYS.member.all, paginationData],
+        queryFn: () => memberService.getAllMembers(paginationData.skip, paginationData.take),
     });
 
     const [deleteModal, setDeleteModal] = useState<{
@@ -135,9 +135,9 @@ export default function MemberList() {
 
     const { teamMembers, totalCount } = data?.data;
 
-    const updatedMember = teamMembers.map((member:{team:string})=>({
+    const updatedMember = teamMembers.map((member: { team: string }) => ({
         ...member,
-        team: teamOptions.find((team)=>team.key===member.team)?.value || "",
+        team: teamOptions.find((team) => team.key === member.team)?.value || "",
     }))
 
     const paginationProps = {

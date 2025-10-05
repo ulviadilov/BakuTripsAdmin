@@ -49,8 +49,8 @@ export default function PartnersList() {
     };
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.partner.all],
-        queryFn: () => partnerService.getAllPartners(0, 10),
+        queryKey: [QUERY_KEYS.partner.all, paginationData],
+        queryFn: () => partnerService.getAllPartners(paginationData.skip, paginationData.take),
     });
     const [deleteModal, setDeleteModal] = useState<{
         isOpen: boolean;

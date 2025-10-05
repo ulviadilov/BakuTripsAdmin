@@ -36,6 +36,17 @@ const columns = [
 export default function TourOptionList() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const [paginationData, setPaginationData] = useState({
+        skip: 0,
+        take: 10,
+    });
+
+    const handlePageChange = (skip: number, take: number) => {
+        setPaginationData({
+            skip: skip || 0,
+            take: take || 10,
+        });
+    }
 
     const handleCreate = () => {
         navigate(paths.PACKAGE_TOUR_OPTION.CREATE);
@@ -50,8 +61,8 @@ export default function TourOptionList() {
     });
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: [QUERY_KEYS.packageOption],
-        queryFn: () => packageOptionService.getAllOptions(0,10)
+        queryKey: [QUERY_KEYS.packageOption, paginationData],
+        queryFn: () => packageOptionService.getAllOptions(paginationData.skip, paginationData.take)
     });
 
     const handleRetry = () => {
@@ -110,10 +121,16 @@ export default function TourOptionList() {
         );
     }
 
-    const handleRowClick = (row:RowType)=>{
+    const handleRowClick = (row: RowType) => {
         navigate(paths.PACKAGE_TOUR_OPTION.DETAIL(row.id))
     }
     const packages = data?.data?.packageOptions;
+    const totalCount = data?.data?.totalCount || 0;
+    const paginationProps = {
+        totalCount: totalCount,
+        skip: paginationData.skip,
+        take: paginationData.take,
+    };
 
     return (
         <>
@@ -126,11 +143,8 @@ export default function TourOptionList() {
                     title="Tours"
                     actions={true}
                     columns={columns}
-                    pagination={{
-                        totalCount: data?.data.totalCount || 0,
-                        skip: 0,
-                        take: 10,
-                    }}
+                    pagination={paginationProps}
+                    onPageChange={handlePageChange}
                     onCreate={handleCreate}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
