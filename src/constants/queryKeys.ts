@@ -2,6 +2,10 @@ export const QUERY_KEYS = {
     category: "category",
     user: "user",
     contact: "contact",
+    orders: {
+        all: ["orders"] as const,
+        detail: (id: string) => ["orders", "detail", id] as const,
+    },
     blog: {
         all: ["blog"] as const,
     },
@@ -37,6 +41,10 @@ export const QUERY_KEYS = {
     },
     slider: {
         all: ["slider"] as const,
+    },
+    customPlace: {
+        all: ["custom-places"] as const,
+        detail: (id: string) => ["custom-places", "detail", id] as const,
     },
     member: {
         all: ["member"] as const,

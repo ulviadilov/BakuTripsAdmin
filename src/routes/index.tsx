@@ -60,6 +60,13 @@ import BlogList from "../pages/Blogs/BlogList";
 import BlogCreate from "../pages/Blogs/BlogCreate";
 import BlogEdit from "../pages/Blogs/BlogEdit";
 import BlogDetail from "../pages/Blogs/BlogDetail";
+import PlaceList from "../pages/CustomPlace/PlaceList";
+import PlaceCreate from "../pages/CustomPlace/PlaceCreate";
+import PlaceEdit from "../pages/CustomPlace/PlaceEdit";
+import RequestsList from "../pages/PartnerRequests/RequestsList";
+import RequestDetail from "../pages/PartnerRequests/RequestDetail";
+import OrdersList from "../pages/Orders/OrdersList";
+import OrderDetail from "../pages/Orders/OrderDetail";
 
 export const router = createBrowserRouter([
     {
@@ -74,6 +81,14 @@ export const router = createBrowserRouter([
                 index: true,
                 path: paths.DASHBOARD,
                 element: <Dashboard />,
+            },
+            {
+                path: paths.ORDERS.LIST,
+                element: <OrdersList />,
+            },
+            {
+                path: paths.ORDERS.DETAIL(),
+                element: <OrderDetail />,
             },
             {
                 path: paths.BLOG.LIST,
@@ -106,6 +121,10 @@ export const router = createBrowserRouter([
             {
                 path: paths.PARTNERS.LIST,
                 element: <PartnersList />,
+            },
+            {
+                path: paths.PARTNER_REQUEST.LIST,
+                element: <RequestsList />,
             },
             {
                 path: paths.PARTNERS.CREATE,
@@ -264,6 +283,10 @@ export const router = createBrowserRouter([
                 element: <ContactDetail />,
             },
             {
+                path: paths.PARTNER_REQUEST.DETAIL(),
+                element: <RequestDetail />,
+            },
+            {
                 path: paths.SETTING.CONTACT.CREATE,
                 element: <ContactCreate />,
             },
@@ -282,6 +305,18 @@ export const router = createBrowserRouter([
             {
                 path: paths.PROMO_CODES.EDIT(),
                 element: <PromoCodeUpdate />,
+            },
+            {
+                path: paths.CUSTOM_PLACE.LIST,
+                element: <PlaceList />,
+            },
+            {
+                path: paths.CUSTOM_PLACE.CREATE,
+                element: <PlaceCreate />,
+            },
+            {
+                path: paths.CUSTOM_PLACE.EDIT(),
+                element: <PlaceEdit />,
             },
         ],
     },

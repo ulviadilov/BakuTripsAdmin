@@ -1,5 +1,9 @@
 export const paths = {
     DASHBOARD: "/",
+    ORDERS: {
+        LIST: "/orders",
+        DETAIL: (id = ":id") => `/orders/detail/${id}`,
+    },
     SLIDER: {
         LIST: "/slider",
         CREATE: "/slider/create",
@@ -15,6 +19,10 @@ export const paths = {
         LIST: "/partners",
         CREATE: "/partners/create",
         EDIT: (id = ":id") => `/partner/${id}`,
+    },
+    PARTNER_REQUEST: {
+        LIST: "/partner-requests",
+        DETAIL: (id = ":id") => `/partner-requests/detail/${id}`,
     },
     CATEGORY: {
         LIST: "/category",
@@ -93,6 +101,11 @@ export const paths = {
         CREATE: "/promo-codes/create",
         EDIT: (id = ":id") => `/promo-codes/${id}`,
     },
+    CUSTOM_PLACE: {
+        LIST: "/custom-places",
+        CREATE: "/custom-places/create",
+        EDIT: (id = ":id") => `/custom-places/${id}`,
+    },
     AUTH: {
         LOGIN: "/login",
     },
@@ -121,9 +134,15 @@ import {
 export const navItems = [
     { label: "Dashboard", icon: Home, path: paths.DASHBOARD },
     { label: "Slider", icon: Sliders, path: paths.SLIDER.LIST },
-    { label: "Orders", icon: Package, path: "/orders" },
+    { label: "Orders", icon: Package, path: paths.ORDERS.LIST },
     { label: "Promo Codes", icon: Percent, path: paths.PROMO_CODES.LIST },
-    { label: "Partners", icon: Building2, path: paths.PARTNERS.LIST },
+    {
+        label: "Partners", icon: Building2,
+        children: [
+            { label: "Partners", icon: Building2, path: paths.PARTNERS.LIST },
+            { label: "Partner Requests", icon: Building2, path: paths.PARTNER_REQUEST.LIST },
+        ]
+    },
     { label: "Team Members", icon: Users2, path: paths.MEMBER.LIST },
     { label: "Blogs", icon: Newspaper, path: paths.BLOG.LIST },
     { label: "Guide", icon: User, path: paths.GUIDE.LIST },
@@ -183,4 +202,5 @@ export const navItems = [
         path: paths.SETTING.CONTACT.LIST,
     },
     { label: "User", icon: UserCircle, path: paths.USER.LIST },
+    { label: "Custom Places", icon: MapPin, path: paths.CUSTOM_PLACE.LIST },
 ];

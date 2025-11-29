@@ -15,19 +15,39 @@ import { otherLanguages } from "../../constants";
 
 const schema = yup.object({
     displayOrder: yup.string().required("Display Order is required"),
-    title: yup.string().required("Title is required"),
-    subTitle: yup.string().required("Sub Title is required"),
+    title: yup.string().optional().default(""),
+    subTitle: yup.string().optional().default(""),
     backgroundImagePath: yup.mixed<File>().required().nullable(),
     translations: yup
         .array()
         .of(
-            yup
-                .object({
-                    languageCode: yup.string().required(),
-                    title: yup.string().required("Title is required"),
-                    subTitle: yup.string().required("Sub Title is required"),
-                })
-                .required()
+            yup.object({
+                languageCode: yup.string().required(),
+                title: yup.string().test(
+                    'title-required',
+                    'Title is required when default title is provided',
+                    function(value) {
+                        const parent = this.from?.[1]?.value;
+                        const defaultTitle = parent?.title;
+                        if (defaultTitle && defaultTitle.trim().length > 0) {
+                            return value != null && value.trim().length > 0;
+                        }
+                        return true;
+                    }
+                ).optional().default(""),
+                subTitle: yup.string().test(
+                    'subtitle-required',
+                    'Subtitle is required when default subtitle is provided',
+                    function(value) {
+                        const parent = this.from?.[1]?.value;
+                        const defaultSubTitle = parent?.subTitle;
+                        if (defaultSubTitle && defaultSubTitle.trim().length > 0) {
+                            return value != null && value.trim().length > 0;
+                        }
+                        return true;
+                    }
+                ).optional().default(""),
+            })
         )
         .required(),
 });
@@ -185,7 +205,7 @@ export default function SliderUpdate() {
                             label="Title"
                             type="text"
                             placeholder="Title"
-                            required={true}
+                            required={false}
                             error={errors.title?.message}
                         />
                     </div>
@@ -196,7 +216,7 @@ export default function SliderUpdate() {
                             label="Sub Title"
                             type="text"
                             placeholder="Sub Title"
-                            required={true}
+                            required={false}
                             error={errors.subTitle?.message}
                         />
                     </div>
@@ -270,7 +290,7 @@ export default function SliderUpdate() {
                                                     errors.translations?.[index]
                                                         ?.title?.message
                                                 }
-                                                required={true}
+                                                required={false}
                                             />
                                             <Input
                                                 name={`translations.${index}.subTitle`}
@@ -281,7 +301,7 @@ export default function SliderUpdate() {
                                                     errors.translations?.[index]
                                                         ?.subTitle?.message
                                                 }
-                                                required={true}
+                                                required={false}
                                             />
                                         </div>
                                     </div>

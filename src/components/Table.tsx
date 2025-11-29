@@ -36,6 +36,8 @@ interface TableProps {
     pagination: PaginationData;
     title?: string;
     searchable?: boolean;
+    /** When true, search triggers only by clicking the search button instead of on each keystroke */
+    searchOnButton?: boolean;
     actions?: boolean;
     creatable?: boolean;
     createButtonText?: string;
@@ -80,7 +82,7 @@ const TableImage: React.FC<{
         setImageLoading(false);
     };
 
-    
+
 
     if (!src || imageError) {
         return (
@@ -199,6 +201,7 @@ export const Table: React.FC<TableProps> = ({
     pagination,
     title = "Data Table",
     searchable = true,
+    searchOnButton = false,
     actions = true,
     creatable = false,
     createButtonText = "Create New",
@@ -218,7 +221,15 @@ export const Table: React.FC<TableProps> = ({
 
     const handleSearchChange = (value: string) => {
         setSearchTerm(value);
-        onSearch?.(value);
+        if (!searchOnButton) {
+            onSearch?.(value);
+        }
+    };
+
+    const handleSearchSubmit = () => {
+        if (searchOnButton) {
+            onSearch?.(searchTerm);
+        }
     };
 
     const handlePageChange = (newPage: number) => {
@@ -274,17 +285,34 @@ export const Table: React.FC<TableProps> = ({
 
                     <div className="flex items-center gap-3">
                         {searchable && (
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                                <input
-                                    type="text"
-                                    placeholder="Search..."
-                                    value={searchTerm}
-                                    onChange={(e) =>
-                                        handleSearchChange(e.target.value)
-                                    }
-                                    className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm w-64"
-                                />
+                            <div className="flex items-center gap-2">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search..."
+                                        value={searchTerm}
+                                        onChange={(e) =>
+                                            handleSearchChange(e.target.value)
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (searchOnButton && e.key === "Enter") {
+                                                e.preventDefault();
+                                                handleSearchSubmit();
+                                            }
+                                        }}
+                                        className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm w-64"
+                                    />
+                                </div>
+                                {searchOnButton && (
+                                    <button
+                                        type="button"
+                                        onClick={handleSearchSubmit}
+                                        className="px-4 py-2.5 bg-gradient-to-r from-primary to-tab hover:from-primary hover:to-tab text-white font-medium rounded-md shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-200"
+                                    >
+                                        Search
+                                    </button>
+                                )}
                             </div>
                         )}
 

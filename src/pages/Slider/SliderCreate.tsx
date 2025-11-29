@@ -18,19 +18,39 @@ const schema = yup.object({
     displayOrder: yup.string().required("Display Order is required"),
     backgroundImage: yup.mixed<File>().required("Background Image is required"),
 
-    title: yup.string().required("Default Title is required"),
-    subTitle: yup.string().required("Default Sub Title is required"),
+    title: yup.string().optional().default(""),
+    subTitle: yup.string().optional().default(""),
 
     translations: yup
         .array()
         .of(
-            yup
-                .object({
-                    languageCode: yup.string().required(),
-                    title: yup.string().required("Title is required"),
-                    subTitle: yup.string().required("Sub Title is required"),
-                })
-                .required()
+            yup.object({
+                languageCode: yup.string().required(),
+                title: yup.string().test(
+                    'title-required',
+                    'Title is required when default title is provided',
+                    function(value) {
+                        const parent = this.from?.[1]?.value;
+                        const defaultTitle = parent?.title;
+                        if (defaultTitle && defaultTitle.trim().length > 0) {
+                            return value != null && value.trim().length > 0;
+                        }
+                        return true;
+                    }
+                ).optional().default(""),
+                subTitle: yup.string().test(
+                    'subtitle-required',
+                    'Subtitle is required when default subtitle is provided',
+                    function(value) {
+                        const parent = this.from?.[1]?.value;
+                        const defaultSubTitle = parent?.subTitle;
+                        if (defaultSubTitle && defaultSubTitle.trim().length > 0) {
+                            return value != null && value.trim().length > 0;
+                        }
+                        return true;
+                    }
+                ).optional().default(""),
+            })
         )
         .required(),
 });
@@ -160,7 +180,7 @@ export default function SliderCreate() {
                                 label="Title"
                                 placeholder="Title"
                                 error={errors.title?.message}
-                                required={true}
+                                required={false}
                             />
                             <Input
                                 name="subTitle"
@@ -168,7 +188,7 @@ export default function SliderCreate() {
                                 label="Sub Title"
                                 placeholder="Sub Title"
                                 error={errors.subTitle?.message}
-                                required={true}
+                                required={false}
                             />
                         </div>
                     </div>
@@ -226,7 +246,7 @@ export default function SliderCreate() {
                                                     errors.translations?.[index]
                                                         ?.title?.message
                                                 }
-                                                required={true}
+                                                required={false}
                                             />
                                             <Input
                                                 name={`translations.${index}.subTitle`}
@@ -237,7 +257,7 @@ export default function SliderCreate() {
                                                     errors.translations?.[index]
                                                         ?.subTitle?.message
                                                 }
-                                                required={true}
+                                                required={false}
                                             />
                                         </div>
                                     </div>
