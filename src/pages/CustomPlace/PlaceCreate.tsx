@@ -46,7 +46,6 @@ export default function PlaceCreate() {
     mutationFn: (data: FormType) => customPlaceService.createPlace(data as any),
     onSuccess: () => {
       toast.success("Place created successfully");
-      reset();
       clearDraft("create:place");
       navigate(paths.CUSTOM_PLACE.LIST);
     },

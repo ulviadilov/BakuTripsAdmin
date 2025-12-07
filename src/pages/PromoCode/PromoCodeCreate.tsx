@@ -63,7 +63,6 @@ export default function PromoCodeCreate() {
         mutationFn: promoService.createPromoCode,
         onSuccess: () => {
             toast.success("Promo Code created successfully");
-            reset();
             clearDraft("create:promo");
             navigate(paths.PROMO_CODES.LIST);
         },

@@ -38,7 +38,6 @@ export default function AddPartner() {
         mutationFn: partnerService.createPartner,
         onSuccess: () => {
             toast.success('Partner created successfully');
-            reset();
             clearDraft('create:partner');
             navigate(paths.PARTNERS.LIST)
         },

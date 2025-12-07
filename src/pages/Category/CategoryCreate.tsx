@@ -51,7 +51,6 @@ export default function CategoryCreate() {
         mutationFn: categoryService.create,
         onSuccess: () => {
             toast.success('Category created successfully');
-            reset();
             clearDraft('create:category');
         },
         onError: (error) => {

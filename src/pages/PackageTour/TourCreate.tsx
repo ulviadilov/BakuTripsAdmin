@@ -84,7 +84,6 @@ export default function TourCreate() {
         mutationFn: packageTourService.createTourPackage,
         onSuccess: () => {
             toast.success("Tour created successfully");
-            reset();
             clearDraft("create:package-tour");
             navigate(paths.PACKAGE_TOUR_PACKAGE.LIST);
         },

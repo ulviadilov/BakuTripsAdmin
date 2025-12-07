@@ -186,7 +186,6 @@ export default function TourCreate() {
         mutationFn: groupTourService.createTour,
         onSuccess: () => {
             toast.success("Tour created successfully");
-            reset();
             clearDraft("create:group-tour");
             navigate("/group-tour");
         },

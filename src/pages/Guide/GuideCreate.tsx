@@ -67,7 +67,6 @@ export default function GuideCreate() {
         mutationFn: guideService.createGuide,
         onSuccess: () => {
             toast.success('Guide created successfully');
-            reset();
             clearDraft("create:guide");
             navigate(paths.GUIDE.LIST);
         },

@@ -81,7 +81,6 @@ export default function DailyProgramCreate() {
         mutationFn: dailyProgramService.createDailyProgram,
         onSuccess: () => {
             toast.success("Daily program created successfully");
-            reset();
             clearDraft("create:daily-program");
             navigate(paths.PACKAGE_DAILY_PROGRAM.LIST);
         },

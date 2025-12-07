@@ -57,7 +57,6 @@ export default function ContactCreate() {
         mutationFn: contactService.create,
         onSuccess: () => {
             toast.success('Contact created successfully');
-            reset();
             clearDraft('create:contact');
         },
         onError: (error) => {

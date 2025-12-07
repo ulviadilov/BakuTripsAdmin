@@ -99,7 +99,6 @@ export default function SliderCreate() {
             sliderService.createSlider(data as any),
         onSuccess: () => {
             toast.success("Slider created successfully");
-            reset();
             clearDraft("create:slider");
             navigate(paths.SLIDER.LIST);
         },

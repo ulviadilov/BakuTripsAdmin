@@ -92,7 +92,6 @@ export default function TourOptionCreate() {
     mutationFn: packageOptionService.createOption,
     onSuccess: () => {
       toast.success('Tour created successfully');
-      reset();
       clearDraft('create:tour-option');
       navigate(paths.PACKAGE_TOUR_OPTION.LIST);
     },

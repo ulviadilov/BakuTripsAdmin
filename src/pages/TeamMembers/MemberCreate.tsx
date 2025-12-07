@@ -85,7 +85,6 @@ export default function MemberCreate() {
         mutationFn: memberService.memberCreate,
         onSuccess: () => {
             toast.success("Member created successfully");
-            reset();
             clearDraft("create:member");
             navigate(paths.MEMBER.LIST);
         },

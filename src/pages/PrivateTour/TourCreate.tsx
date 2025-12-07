@@ -128,7 +128,6 @@ export default function TourCreate() {
         mutationFn: privateTourService.createTour,
         onSuccess: () => {
             toast.success("Tour created successfully");
-            reset();
             clearDraft("create:private-tour");
             navigate(paths.PRIVATE_TOUR.LIST);
         },

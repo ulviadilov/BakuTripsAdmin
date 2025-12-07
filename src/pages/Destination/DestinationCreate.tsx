@@ -74,7 +74,6 @@ export default function DestinationCreate() {
         mutationFn: destinationService.create,
         onSuccess: () => {
             toast.success('Destination created successfully');
-            reset();
             clearDraft("create:destination");
             navigate(paths.DESTINATION.LIST);
         },
