@@ -20,26 +20,26 @@ export default function AddPartner() {
         handleSubmit,
         reset,
         watch,
-        formState:{errors}
+        formState: { errors }
     } = useForm({
         resolver: yupResolver(schema),
-        defaultValues:{
-            companyName:"",
-            partnerLogoImage:undefined
+        defaultValues: {
+            companyName: "",
+            partnerLogoImage: undefined
         }
     });
 
     // Persist partner draft (omit logo image)
-    useFormDraft("create:partner", { reset, watch }, { omit: ["partnerLogoImage"] });
+    useFormDraft<any>("create:partner", { reset, watch }, { omit: ["partnerLogoImage"] });
 
     const navigate = useNavigate()
 
-      const mutation = useMutation({
+    const mutation = useMutation({
         mutationFn: partnerService.createPartner,
         onSuccess: () => {
             toast.success('Partner created successfully');
             reset();
-                        clearDraft('create:partner');
+            clearDraft('create:partner');
             navigate(paths.PARTNERS.LIST)
         },
         onError: (error: any) => {
@@ -48,15 +48,15 @@ export default function AddPartner() {
         }
     });
 
-    const onSubmit = async (data:{companyName:string,partnerLogoImage:File | null}) =>{
+    const onSubmit = async (data: { companyName: string, partnerLogoImage: File | null }) => {
         mutation.mutate(data)
     }
 
-    const handleBack =()=>{
+    const handleBack = () => {
         navigate(paths.PARTNERS.LIST)
     }
     return (
-            <div className="p-8">
+        <div className="p-8">
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center space-x-4">
                     <button
