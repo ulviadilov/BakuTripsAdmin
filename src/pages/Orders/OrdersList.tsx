@@ -36,9 +36,9 @@ export default function OrdersList() {
             <span className="bg-green-500 py-1 px-2.5 rounded-3xl text-white">
                 Paid
             </span>
-        ) : r.status === "Refund" ? (
+        ) : r.status === "Refunded" ? (
             <span className="bg-red-500 py-1 px-2.5 rounded-3xl text-white">
-                Refund
+                Refunded
             </span>
         ) : null,
         totalAmount: r.totalAmount,

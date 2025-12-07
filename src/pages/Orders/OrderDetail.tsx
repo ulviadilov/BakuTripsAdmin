@@ -1,10 +1,14 @@
 import { useParams, useNavigate } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ordersService } from "../../services/orders";
 import { QUERY_KEYS } from "../../constants/queryKeys";
 import { paths } from "../../constants/path";
+import { StatusChangeModal, RefundItemModal } from "../../components/Modal";
+import toast from "react-hot-toast";
+import { useState } from "react";
 
 interface OrderItemDetail {
+  id: string;
   orderId: string;
   tourId: string;
   totalPrice: number;
@@ -56,12 +60,81 @@ function formatDate(iso: string | undefined) {
 export default function OrderDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [statusModal, setStatusModal] = useState<{
+    isOpen: boolean;
+    currentStatus: string;
+    newStatus: string;
+  }>({
+    isOpen: false,
+    currentStatus: "",
+    newStatus: "",
+  });
+  const [refundItemModal, setRefundItemModal] = useState<{
+    isOpen: boolean;
+    itemId: string;
+    tourName: string;
+  }>({
+    isOpen: false,
+    itemId: "",
+    tourName: "",
+  });
 
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: QUERY_KEYS.orders.detail(id || ""),
     queryFn: () => ordersService.getOrderById(id || ""),
     enabled: !!id,
   });
+
+  const statusChangeMutation = useMutation({
+    mutationFn: (newStatus: string) => ordersService.changeOrderStatus(id || "", newStatus),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders.detail(id || "") });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders.all });
+      setStatusModal({ isOpen: false, currentStatus: "", newStatus: "" });
+      toast.success("Order status updated successfully");
+    },
+    onError: () => {
+      toast.error("Failed to update order status");
+    },
+  });
+
+  const handleStatusChange = (currentStatus: string, newStatus: string) => {
+    setStatusModal({
+      isOpen: true,
+      currentStatus,
+      newStatus,
+    });
+  };
+
+  const handleConfirmStatusChange = () => {
+    statusChangeMutation.mutate(statusModal.newStatus);
+  };
+
+  const refundItemMutation = useMutation({
+    mutationFn: (itemId: string) => ordersService.refundOrderItem(id || "", itemId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders.detail(id || "") });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders.all });
+      setRefundItemModal({ isOpen: false, itemId: "", tourName: "" });
+      toast.success("Item refunded successfully");
+    },
+    onError: () => {
+      toast.error("Failed to refund item");
+    },
+  });
+
+  const handleRefundItem = (itemId: string, tourName: string) => {
+    setRefundItemModal({
+      isOpen: true,
+      itemId,
+      tourName,
+    });
+  };
+
+  const handleConfirmRefundItem = () => {
+    refundItemMutation.mutate(refundItemModal.itemId);
+  };
 
   const handleBack = () => {
     navigate(paths.ORDERS.LIST);
@@ -165,6 +238,20 @@ export default function OrderDetail() {
                   Order Date: <span className="font-medium">{formatDate(order.orderDate)}</span>
                 </p>
               </div>
+            </div>
+            <div>
+              <button
+                onClick={() => {
+                  const newStatus = order.status === "Paid" ? "Refund" : "Paid";
+                  handleStatusChange(order.status, newStatus);
+                }}
+                className="inline-flex items-center px-5 py-2.5 bg-primary cursor-pointer text-white rounded-lg transition-colors font-medium shadow-sm hover:shadow-md"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Refund Order
+              </button>
             </div>
           </div>
         </div>
@@ -343,8 +430,21 @@ export default function OrderDetail() {
                   {order.orderItems.map((item, idx) => (
                     <div key={idx} className="border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-300 hover:shadow-lg transition-all group">
                       {/* Item Number Badge */}
-                      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-1.5">
+                      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-1.5 flex items-center justify-between">
                         <p className="text-xs font-bold text-white tracking-wide">ITEM #{idx + 1}</p>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRefundItem(item.id, item.tourName);
+                          }}
+                          className="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-md hover:bg-red-600 transition-colors flex items-center gap-1.5"
+                          title="Refund this item"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                          </svg>
+                          Refund
+                        </button>
                       </div>
 
                       <div className="flex flex-col sm:flex-row">
@@ -461,6 +561,30 @@ export default function OrderDetail() {
           </div>
         </div>
       </div>
+      <StatusChangeModal
+        isOpen={statusModal.isOpen}
+        onClose={() => {
+          if (!statusChangeMutation.isPending) {
+            setStatusModal({ isOpen: false, currentStatus: "", newStatus: "" });
+          }
+        }}
+        onConfirm={handleConfirmStatusChange}
+        orderNumber={order.orderNumber}
+        currentStatus={statusModal.currentStatus}
+        newStatus={statusModal.newStatus}
+        isChanging={statusChangeMutation.isPending}
+      />
+      <RefundItemModal
+        isOpen={refundItemModal.isOpen}
+        onClose={() => {
+          if (!refundItemMutation.isPending) {
+            setRefundItemModal({ isOpen: false, itemId: "", tourName: "" });
+          }
+        }}
+        onConfirm={handleConfirmRefundItem}
+        tourName={refundItemModal.tourName}
+        isRefunding={refundItemMutation.isPending}
+      />
     </div>
   );
 }
