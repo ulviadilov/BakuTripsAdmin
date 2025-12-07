@@ -99,13 +99,6 @@ export default function OrderDetail() {
         },
     });
 
-    const handleStatusChange = (currentStatus: string, newStatus: string) => {
-        setStatusModal({
-            isOpen: true,
-            currentStatus,
-            newStatus,
-        });
-    };
 
     const handleConfirmStatusChange = () => {
         statusChangeMutation.mutate(statusModal.newStatus);
