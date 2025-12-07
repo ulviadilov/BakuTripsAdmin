@@ -20,7 +20,7 @@ interface DestinationFormData {
     displayOrder: string;
     name: string;
     duration: string;
-    description: string;
+    description?: string;
     imageFile?: File | undefined;
     Translations?: DestinationTranslation[];
 }
@@ -30,7 +30,6 @@ const schema = yup.object({
     displayOrder: yup.string().required("Display order is required"),
     name: yup.string().required("Destination name is required").min(2, "Name must be at least 2 characters"),
     duration: yup.string().required("Duration is required"),
-    description: yup.string().required("Description is required").min(10, "Description must be at least 10 characters"),
 });
 
 export default function DestinationEdit() {

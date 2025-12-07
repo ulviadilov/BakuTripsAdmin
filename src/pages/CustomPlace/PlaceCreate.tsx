@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useFormDraft, clearDraft } from "../../utils/draft";
 import { useForm, useFieldArray } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -26,7 +27,7 @@ type FormType = yup.InferType<typeof schema>;
 
 export default function PlaceCreate() {
   const navigate = useNavigate();
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<FormType>({
+  const { control, handleSubmit, reset, watch, formState: { errors } } = useForm<FormType>({
     resolver: yupResolver(schema),
     defaultValues: {
       name: "",
@@ -34,6 +35,9 @@ export default function PlaceCreate() {
       translations: otherLanguages.map((l) => ({ languageCode: l.code, name: "" })),
     },
   });
+
+  // Persist place draft (omit placeImage)
+  useFormDraft<FormType>("create:place", { reset, watch }, { omit: ["placeImage"] });
 
   const { fields } = useFieldArray({ control, name: "translations" });
   const [activeLang, setActiveLang] = useState(otherLanguages[0]?.code || "");
@@ -43,6 +47,7 @@ export default function PlaceCreate() {
     onSuccess: () => {
       toast.success("Place created successfully");
       reset();
+      clearDraft("create:place");
       navigate(paths.CUSTOM_PLACE.LIST);
     },
     onError: (error: any) => {

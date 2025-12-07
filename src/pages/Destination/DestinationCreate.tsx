@@ -13,6 +13,7 @@ import { tourService } from "../../services/tours";
 import { paths } from "../../constants/path";
 import { otherLanguages } from "../../constants";
 import { useState } from "react";
+import { useFormDraft, clearDraft } from "../../utils/draft";
 import type { DestinationTranslation } from "../../services/destination/types";
 
 interface DestinationFormData {
@@ -20,7 +21,7 @@ interface DestinationFormData {
     displayOrder: string;
     name: string;
     duration: string;
-    description: string;
+    description?: string;
     imageFile?: File | undefined;
     Translations?: DestinationTranslation[];
 }
@@ -30,20 +31,20 @@ const schema = yup.object({
     displayOrder: yup.string().required("Display order is required"),
     name: yup.string().required("Destination name is required").min(2, "Name must be at least 2 characters"),
     duration: yup.string().required("Duration is required"),
-    description: yup.string().required("Description is required").min(10, "Description must be at least 10 characters"),
 });
 
 export default function DestinationCreate() {
     const navigate = useNavigate();
-    const {data,isPending} = useQuery({
-        queryKey:[QUERY_KEYS.tour.select],
-        queryFn:tourService.tourSelect
+    const { data, isPending } = useQuery({
+        queryKey: [QUERY_KEYS.tour.select],
+        queryFn: tourService.tourSelect
     })
 
     const {
         control,
         handleSubmit,
         reset,
+        watch,
         formState: { errors }
     } = useForm<DestinationFormData>({
         resolver: yupResolver(schema),
@@ -63,6 +64,9 @@ export default function DestinationCreate() {
         }
     });
 
+    // Persist draft (omit image files)
+    useFormDraft<DestinationFormData>("create:destination", { reset, watch }, { omit: ["imageFile"] });
+
     const { fields: translationFields } = useFieldArray({ control, name: 'Translations' });
     const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || 'az');
 
@@ -71,6 +75,7 @@ export default function DestinationCreate() {
         onSuccess: () => {
             toast.success('Destination created successfully');
             reset();
+            clearDraft("create:destination");
             navigate(paths.DESTINATION.LIST);
         },
         onError: (error: any) => {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useFormDraft, clearDraft } from "../../utils/draft";
 import { useForm, useFieldArray } from "react-hook-form";
 import { FileUpload } from "../../components/FIleUpload";
 import * as yup from "yup";
@@ -64,6 +65,7 @@ export default function SliderCreate() {
         control,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<SliderFormType>({
         resolver: yupResolver(schema),
@@ -80,6 +82,9 @@ export default function SliderCreate() {
         },
     });
 
+    // Persist slider draft (omit backgroundImage)
+    useFormDraft<SliderFormType>("create:slider", { reset, watch }, { omit: ["backgroundImage"] });
+
     const { fields } = useFieldArray({
         control,
         name: "translations",
@@ -95,6 +100,7 @@ export default function SliderCreate() {
         onSuccess: () => {
             toast.success("Slider created successfully");
             reset();
+            clearDraft("create:slider");
             navigate(paths.SLIDER.LIST);
         },
         onError: (error: any) => {

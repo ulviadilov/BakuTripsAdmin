@@ -8,6 +8,7 @@ import Input from "../../components/Input";
 import { paths } from "../../constants/path";
 import { guideService } from "../../services/guide";
 import { useState } from "react";
+import { useFormDraft, clearDraft } from "../../utils/draft";
 import { otherLanguages } from "../../constants";
 
 interface GuideFormData {
@@ -42,6 +43,7 @@ export default function GuideCreate() {
         control,
         handleSubmit,
         reset,
+        watch,
         formState: { errors }
     } = useForm<GuideFormData>({
         resolver: yupResolver(schema),
@@ -55,6 +57,9 @@ export default function GuideCreate() {
         }
     });
 
+    // Persist guide draft
+    useFormDraft<GuideFormData>("create:guide", { reset, watch });
+
     const { fields } = useFieldArray({ control, name: "translations" });
     const [activeLang, setActiveLang] = useState(otherLanguages[0]?.code ?? "");
 
@@ -63,6 +68,7 @@ export default function GuideCreate() {
         onSuccess: () => {
             toast.success('Guide created successfully');
             reset();
+            clearDraft("create:guide");
             navigate(paths.GUIDE.LIST);
         },
         onError: (error: any) => {

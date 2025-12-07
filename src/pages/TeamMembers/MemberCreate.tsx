@@ -11,6 +11,7 @@ import { memberService } from "../../services/member";
 import Select from "../../components/Select";
 import { teamOptions } from "../../constants/team";
 import { useState } from "react";
+import { useFormDraft, clearDraft } from "../../utils/draft";
 import { otherLanguages } from "../../constants";
 
 const defaultLanguage = { code: "en", name: "English" };
@@ -49,6 +50,7 @@ export default function MemberCreate() {
         control,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<MemberFormType>({
         resolver: yupResolver(schema),
@@ -68,6 +70,9 @@ export default function MemberCreate() {
         },
     });
 
+    // Persist member draft (omit image files)
+    useFormDraft<MemberFormType>("create:member", { reset, watch }, { omit: ["posterImage", "hoverImage"] });
+
     const { fields } = useFieldArray({ control, name: "translations" });
 
     const [activeLang, setActiveLang] = useState(
@@ -81,6 +86,7 @@ export default function MemberCreate() {
         onSuccess: () => {
             toast.success("Member created successfully");
             reset();
+            clearDraft("create:member");
             navigate(paths.MEMBER.LIST);
         },
         onError: (error: any) => {

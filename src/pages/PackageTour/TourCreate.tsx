@@ -2,6 +2,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useState } from "react";
+import { useFormDraft, clearDraft } from "../../utils/draft";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import * as yup from "yup";
@@ -55,6 +56,7 @@ export default function TourCreate() {
         control,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<TourFormData>({
         resolver: yupResolver(schema),
@@ -72,6 +74,9 @@ export default function TourCreate() {
         },
     });
 
+    // Persist draft for Package Tour create (omit file fields)
+    useFormDraft<TourFormData>("create:package-tour", { reset, watch }, { omit: ["posterImageFile"] });
+
     const { fields: translationFields } = useFieldArray({ control, name: "Translations" });
     const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || "az");
 
@@ -80,6 +85,7 @@ export default function TourCreate() {
         onSuccess: () => {
             toast.success("Tour created successfully");
             reset();
+            clearDraft("create:package-tour");
             navigate(paths.PACKAGE_TOUR_PACKAGE.LIST);
         },
         onError: (error) => {

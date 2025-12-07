@@ -2,6 +2,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { useState } from "react";
+import { useFormDraft, clearDraft } from "../../../utils/draft";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import * as yup from "yup";
@@ -46,6 +47,7 @@ export default function TourOptionCreate() {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors }
   } = useForm<PackageTourOption>({
     resolver: yupResolver(schema),
@@ -80,6 +82,9 @@ export default function TourOptionCreate() {
     }
   });
 
+  // Persist tour option draft (omit file fields)
+  useFormDraft<PackageTourOption>("create:tour-option", { reset, watch }, { omit: ["vrimagefile", "tourimagefiles"] });
+
   const { fields: translationFields } = useFieldArray({ control, name: "Translations" });
   const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || "az");
 
@@ -88,6 +93,7 @@ export default function TourOptionCreate() {
     onSuccess: () => {
       toast.success('Tour created successfully');
       reset();
+      clearDraft('create:tour-option');
       navigate(paths.PACKAGE_TOUR_OPTION.LIST);
     },
     onError: (error) => {

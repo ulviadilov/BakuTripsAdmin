@@ -3,7 +3,7 @@ export interface RequestDestination {
     displayOrder: string;
     name: string;
     duration: string;
-    description: string;
+    description?: string;
     imageFile?: File | null;
     // Capital Translations for backend
     Translations?: DestinationTranslation[];

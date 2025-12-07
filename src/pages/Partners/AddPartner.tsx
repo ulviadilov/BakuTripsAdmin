@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { useFormDraft, clearDraft } from "../../utils/draft";
 import { FileUpload } from "../../components/FIleUpload";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -18,6 +19,7 @@ export default function AddPartner() {
         control,
         handleSubmit,
         reset,
+        watch,
         formState:{errors}
     } = useForm({
         resolver: yupResolver(schema),
@@ -27,6 +29,9 @@ export default function AddPartner() {
         }
     });
 
+    // Persist partner draft (omit logo image)
+    useFormDraft("create:partner", { reset, watch }, { omit: ["partnerLogoImage"] });
+
     const navigate = useNavigate()
 
       const mutation = useMutation({
@@ -34,6 +39,7 @@ export default function AddPartner() {
         onSuccess: () => {
             toast.success('Partner created successfully');
             reset();
+                        clearDraft('create:partner');
             navigate(paths.PARTNERS.LIST)
         },
         onError: (error: any) => {

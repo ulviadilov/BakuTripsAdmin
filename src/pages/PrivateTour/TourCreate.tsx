@@ -2,6 +2,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { useState } from "react";
+import { useFormDraft, clearDraft } from "../../utils/draft";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import * as yup from "yup";
@@ -79,6 +80,7 @@ export default function TourCreate() {
         control,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<PrivateFormData>({
         resolver: yupResolver(schema),
@@ -112,6 +114,9 @@ export default function TourCreate() {
         },
     });
 
+    // Persist draft for Private Tour create (omit file fields)
+    useFormDraft<PrivateFormData>("create:private-tour", { reset, watch }, { omit: ["posterimagefile", "vrimagefile", "tourimagefiles"] });
+
     const { fields: translationFields } = useFieldArray({
         control,
         name: "Translations",
@@ -124,6 +129,7 @@ export default function TourCreate() {
         onSuccess: () => {
             toast.success("Tour created successfully");
             reset();
+            clearDraft("create:private-tour");
             navigate(paths.PRIVATE_TOUR.LIST);
         },
         onError: (error) => {

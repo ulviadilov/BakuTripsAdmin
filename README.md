@@ -52,3 +52,57 @@ export default tseslint.config({
   },
 })
 ```
+## Draft Persistence (Autosave) for Create Pages
+
+- Purpose: Keep unsaved form data if you navigate away or close the tab, and restore it when you come back to the same create page.
+
+- Utilities: See `src/utils/draft.ts` which provides `useDraftState`, `saveDraft`, `loadDraft`, and `clearDraft`.
+
+- Recommended usage (drop-in for `useState`):
+
+```tsx
+import { useDraftState } from "../utils/draft"; // adjust path per file
+
+// Inside a Create page component
+export default function BlogCreate() {
+  // Choose a unique key per page/form. Route + entity works well.
+  const DRAFT_KEY = "create:blog"; // e.g., include userId if multi-user
+
+  const [form, setForm, draft] = useDraftState(DRAFT_KEY, {
+    title: "",
+    slug: "",
+    body: "",
+    tags: [],
+    coverUrl: "",
+  });
+
+  const onChange = (field: keyof typeof form, value: any) => {
+    setForm({ ...form, [field]: value });
+  };
+
+  const onSubmit = async () => {
+    // call API with `form`
+    // await api.blogs.create(form);
+    // Clear draft after successful submit so the page starts fresh next time
+    draft.clear();
+  };
+
+  return (
+    <div>
+      {/* bind inputs to `form` and update via `onChange` */}
+    </div>
+  );
+}
+```
+
+- Keying strategy:
+  - Use a stable, unique key per form, e.g., `create:destination`, `create:guide`, etc.
+  - If drafts should be separate per user, include user id: `create:blog:user:123`.
+
+- Clearing behavior:
+  - Call `draft.clear()` after a successful submit.
+  - Optionally call on explicit "Discard draft" button.
+
+- Notes:
+  - Data is stored in `localStorage` only on the client.
+  - Restores automatically when the component mounts using the same key.

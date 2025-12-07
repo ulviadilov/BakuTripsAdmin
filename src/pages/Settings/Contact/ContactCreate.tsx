@@ -8,6 +8,7 @@ import Input from '../../../components/Input'
 import { contactService } from '../../../services/settings/contact'
 import { otherLanguages } from '../../../constants'
 import { useState } from 'react'
+import { useFormDraft, clearDraft } from '../../../utils/draft'
 
 const schema = yup.object().shape({
     displayOrder: yup.number().required("Display order is required").min(0, "Display order must be 0 or greater"),
@@ -28,6 +29,7 @@ export default function ContactCreate() {
         control,
         handleSubmit,
         reset,
+        watch,
         formState: { errors }
     } = useForm<FormData>({
         resolver: yupResolver(schema),
@@ -41,6 +43,9 @@ export default function ContactCreate() {
         }
     })
 
+    // Persist contact draft
+    useFormDraft<FormData>('create:contact', { reset, watch });
+
     const { fields: translationFields, append } = useFieldArray({ name: 'translations' as any, control: control as any })
     const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || 'az')
     // Seed translations (not in schema type, but we pass along)
@@ -53,6 +58,7 @@ export default function ContactCreate() {
         onSuccess: () => {
             toast.success('Contact created successfully');
             reset();
+            clearDraft('create:contact');
         },
         onError: (error) => {
             console.log(error)

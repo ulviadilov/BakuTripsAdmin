@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useFormDraft, clearDraft } from "../../utils/draft";
 import * as yup from "yup";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -65,6 +66,8 @@ export default function BlogCreate() {
     const {
         control,
         handleSubmit,
+        reset,
+        watch,
         formState: { errors },
     } = useForm<FormValues>({
         resolver: yupResolver(schema),
@@ -88,12 +91,16 @@ export default function BlogCreate() {
         },
     });
 
+    // Persist blog draft (omit image files)
+    useFormDraft<FormValues>("create:blog", { reset, watch }, { omit: ["FirstImageFile", "SecondImageFile"] });
+
     const { fields } = useFieldArray({ control, name: "Translations" });
 
     const mutation = useMutation({
         mutationFn: (data: FormValues) => blogsService.create(data),
         onSuccess: () => {
             toast.success("Blog created successfully");
+            clearDraft("create:blog");
             navigate(paths.BLOG.LIST);
         },
         onError: () => toast.error("Failed to create blog"),

@@ -8,6 +8,7 @@ import { categoryService } from '../../services/category'
 import toast from 'react-hot-toast'
 import { otherLanguages } from '../../constants'
 import { useState } from 'react'
+import { useFormDraft, clearDraft } from '../../utils/draft'
 
 const schema: yup.ObjectSchema<FormData> = yup.object({
     name: yup.string().required("Category is required"),
@@ -31,6 +32,7 @@ export default function CategoryCreate() {
         control,
         handleSubmit,
         reset,
+        watch,
         formState: { errors }
     } = useForm<FormData>({
         resolver: yupResolver(schema),
@@ -38,6 +40,9 @@ export default function CategoryCreate() {
             Translations: otherLanguages.map(l => ({ languageCode: l.code, name: '' }))
         }
     })
+
+    // Persist category draft
+    useFormDraft<FormData>('create:category', { reset, watch });
 
     const { fields: translationFields } = useFieldArray({ control, name: 'Translations' })
     const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || 'az')
@@ -47,6 +52,7 @@ export default function CategoryCreate() {
         onSuccess: () => {
             toast.success('Category created successfully');
             reset();
+            clearDraft('create:category');
         },
         onError: (error) => {
             console.log(error)

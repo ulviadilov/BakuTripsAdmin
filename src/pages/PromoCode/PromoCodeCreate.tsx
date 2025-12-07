@@ -1,4 +1,5 @@
 import { Controller, useForm } from "react-hook-form";
+import { useFormDraft, clearDraft } from "../../utils/draft";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router";
@@ -39,6 +40,7 @@ export default function PromoCodeCreate() {
         control,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<PromoCodeCreateRequest>({
         resolver: yupResolver(schema),
@@ -52,6 +54,9 @@ export default function PromoCodeCreate() {
         },
     });
 
+    // Persist promo code draft
+    useFormDraft<PromoCodeCreateRequest>("create:promo", { reset, watch });
+
     const navigate = useNavigate();
 
     const mutation = useMutation({
@@ -59,6 +64,7 @@ export default function PromoCodeCreate() {
         onSuccess: () => {
             toast.success("Promo Code created successfully");
             reset();
+            clearDraft("create:promo");
             navigate(paths.PROMO_CODES.LIST);
         },
         onError: (error: any) => {

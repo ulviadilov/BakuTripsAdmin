@@ -14,6 +14,7 @@ import { ArrayInput } from "../../../components/ArrayInput";
 import type { DailyProgram, DailyProgramTranslation } from "../../../types";
 import { otherLanguages } from "../../../constants";
 import { useState } from "react";
+import { useFormDraft, clearDraft } from "../../../utils/draft";
 
 
 const schema: yup.ObjectSchema<DailyProgram> = yup.object({
@@ -47,6 +48,7 @@ export default function DailyProgramCreate() {
         control,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<DailyProgram>({
         resolver: yupResolver(schema),
@@ -63,6 +65,9 @@ export default function DailyProgramCreate() {
         },
     });
 
+    // Persist daily program draft
+    useFormDraft<DailyProgram>("create:daily-program", { reset, watch });
+
     const { fields: translationFields } = useFieldArray({ control, name: "translations" });
     const [activeLang, setActiveLang] = useState<string>(otherLanguages[0]?.code || "az");
 
@@ -77,6 +82,7 @@ export default function DailyProgramCreate() {
         onSuccess: () => {
             toast.success("Daily program created successfully");
             reset();
+            clearDraft("create:daily-program");
             navigate(paths.PACKAGE_DAILY_PROGRAM.LIST);
         },
         onError: (error) => {
