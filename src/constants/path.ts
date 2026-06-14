@@ -15,15 +15,7 @@ export const paths = {
         EDIT: (id = ":id") => `/blogs/${id}`,
         DETAIL: (id = ":id") => `/blogs/detail/${id}`,
     },
-    PARTNERS: {
-        LIST: "/partners",
-        CREATE: "/partners/create",
-        EDIT: (id = ":id") => `/partner/${id}`,
-    },
-    PARTNER_REQUEST: {
-        LIST: "/partner-requests",
-        DETAIL: (id = ":id") => `/partner-requests/detail/${id}`,
-    },
+
     CATEGORY: {
         LIST: "/category",
         CREATE: "/category/create",
@@ -68,16 +60,7 @@ export const paths = {
         EDIT: (id = ":id") => `/destination/${id}`,
         DETAIL: (id = ":id") => `/destination/detail/${id}`,
     },
-    MEMBER: {
-        LIST: "/member",
-        CREATE: "/member/create",
-        EDIT: (id = ":id") => `/member/${id}`,
-    },
-    USER: {
-        LIST: "/user",
-        CREATE: "/user/create",
-        EDIT: (id = ":id") => `/user/${id}`,
-    },
+
     SETTING: {
         CONTACT: {
             LIST: "/contact",
@@ -96,11 +79,7 @@ export const paths = {
         CREATE: "/guide/create",
         EDIT: (id = ":id") => `/guide/${id}`,
     },
-    PROMO_CODES: {
-        LIST: "/promo-codes",
-        CREATE: "/promo-codes/create",
-        EDIT: (id = ":id") => `/promo-codes/${id}`,
-    },
+
     CUSTOM_PLACE: {
         LIST: "/custom-places",
         CREATE: "/custom-places/create",
@@ -114,9 +93,6 @@ export const paths = {
 import {
     Home,
     Package,
-    Percent,
-    Building2,
-    Users2,
     Newspaper,
     Compass,
     Map,
@@ -127,7 +103,6 @@ import {
     User,
     Contact,
     Calendar,
-    UserCircle,
     Sliders,
 } from "lucide-react";
 
@@ -135,15 +110,6 @@ export const navItems = [
     { label: "Dashboard", icon: Home, path: paths.DASHBOARD },
     { label: "Slider", icon: Sliders, path: paths.SLIDER.LIST },
     { label: "Orders", icon: Package, path: paths.ORDERS.LIST },
-    { label: "Promo Codes", icon: Percent, path: paths.PROMO_CODES.LIST },
-    {
-        label: "Partners", icon: Building2,
-        children: [
-            { label: "Partners", icon: Building2, path: paths.PARTNERS.LIST },
-            { label: "Partner Requests", icon: Building2, path: paths.PARTNER_REQUEST.LIST },
-        ]
-    },
-    { label: "Team Members", icon: Users2, path: paths.MEMBER.LIST },
     { label: "Blogs", icon: Newspaper, path: paths.BLOG.LIST },
     { label: "Guide", icon: User, path: paths.GUIDE.LIST },
     {
@@ -201,6 +167,5 @@ export const navItems = [
         icon: Contact,
         path: paths.SETTING.CONTACT.LIST,
     },
-    { label: "User", icon: UserCircle, path: paths.USER.LIST },
     { label: "Custom Places", icon: MapPin, path: paths.CUSTOM_PLACE.LIST },
 ];

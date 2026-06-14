@@ -3,7 +3,7 @@
 
 export type DraftKey = string;
 
-const STORAGE_PREFIX = "bakuheritage:draft:";
+const STORAGE_PREFIX = "kyrgyzstanheritage:draft:";
 
 function storageKey(key: DraftKey) {
   return `${STORAGE_PREFIX}${key}`;

@@ -2,8 +2,7 @@ import { createBrowserRouter } from "react-router";
 import MainLayout from "../layout/MainLayout";
 import { paths } from "../constants/path";
 import Dashboard from "../pages/Dashboard";
-import PartnersList from "../pages/Partners/Partners";
-import AddPartner from "../pages/Partners/AddPartner";
+
 import CategoryList from "../pages/Category/CategoryList";
 import CategoryCreate from "../pages/Category/CategoryCreate";
 import CategoryEdit from "../pages/Category/CategoryEdit";
@@ -25,7 +24,7 @@ import PackageTour from "../pages/PackageTour/TourList";
 import DestinationList from "../pages/Destination/DestinationList";
 import DestinationCreate from "../pages/Destination/DestinationCreate";
 import PackageTourCreate from "../pages/PackageTour/TourCreate";
-import UserList from "../pages/User/UserList";
+
 import ContactList from "../pages/Settings/Contact/ContactList";
 import ContactCreate from "../pages/Settings/Contact/ContactCreate";
 import ContactEdit from "../pages/Settings/Contact/ContactEdit";
@@ -43,19 +42,15 @@ import DailyProgramCreate from "../pages/PackageTour/DailyProgram/DailyProgramCr
 import DailyProgramEdit from "../pages/PackageTour/DailyProgram/DailyProgramEdit";
 import LoginPage from "../pages/Login/Login";
 import AuthGuard from "../layout/AuthGuard";
-import EditPartner from "../pages/Partners/EditPartner";
+
 import GuideList from "../pages/Guide/GuideList";
 import GuideCreate from "../pages/Guide/GuideCreate";
 import GuideEdit from "../pages/Guide/GuideEdit";
 import SliderCreate from "../pages/Slider/SliderCreate";
 import SliderList from "../pages/Slider/SliderList";
 import SliderUpdate from "../pages/Slider/SliderUpdate";
-import MemberList from "../pages/TeamMembers/MemberList";
-import MemberCreate from "../pages/TeamMembers/MemberCreate";
-import MemberUpdate from "../pages/TeamMembers/MemberUpdate";
-import PromoCodeList from "../pages/PromoCode/PromoCodeList";
-import PromoCodeCreate from "../pages/PromoCode/PromoCodeCreate";
-import PromoCodeUpdate from "../pages/PromoCode/PromoCodeUpdate";
+
+
 import BlogList from "../pages/Blogs/BlogList";
 import BlogCreate from "../pages/Blogs/BlogCreate";
 import BlogEdit from "../pages/Blogs/BlogEdit";
@@ -63,8 +58,7 @@ import BlogDetail from "../pages/Blogs/BlogDetail";
 import PlaceList from "../pages/CustomPlace/PlaceList";
 import PlaceCreate from "../pages/CustomPlace/PlaceCreate";
 import PlaceEdit from "../pages/CustomPlace/PlaceEdit";
-import RequestsList from "../pages/PartnerRequests/RequestsList";
-import RequestDetail from "../pages/PartnerRequests/RequestDetail";
+
 import OrdersList from "../pages/Orders/OrdersList";
 import OrderDetail from "../pages/Orders/OrderDetail";
 
@@ -118,22 +112,7 @@ export const router = createBrowserRouter([
                 path: paths.SLIDER.CREATE,
                 element: <SliderCreate />,
             },
-            {
-                path: paths.PARTNERS.LIST,
-                element: <PartnersList />,
-            },
-            {
-                path: paths.PARTNER_REQUEST.LIST,
-                element: <RequestsList />,
-            },
-            {
-                path: paths.PARTNERS.CREATE,
-                element: <AddPartner />,
-            },
-            {
-                path: paths.PARTNERS.EDIT(),
-                element: <EditPartner />,
-            },
+
             {
                 path: paths.CATEGORY.LIST,
                 element: <CategoryList />,
@@ -146,18 +125,7 @@ export const router = createBrowserRouter([
                 path: paths.CATEGORY.EDIT(),
                 element: <CategoryEdit />,
             },
-            {
-                path: paths.MEMBER.LIST,
-                element: <MemberList />,
-            },
-            {
-                path: paths.MEMBER.CREATE,
-                element: <MemberCreate />,
-            },
-            {
-                path: paths.MEMBER.EDIT(),
-                element: <MemberUpdate />,
-            },
+
             {
                 path: paths.GUIDE.LIST,
                 element: <GuideList />,
@@ -270,10 +238,7 @@ export const router = createBrowserRouter([
                 path: paths.DESTINATION.EDIT(),
                 element: <DestinationEdit />,
             },
-            {
-                path: paths.USER.LIST,
-                element: <UserList />,
-            },
+
             {
                 path: paths.SETTING.CONTACT.LIST,
                 element: <ContactList />,
@@ -282,10 +247,7 @@ export const router = createBrowserRouter([
                 path: paths.SETTING.CONTACT.DETAIL(),
                 element: <ContactDetail />,
             },
-            {
-                path: paths.PARTNER_REQUEST.DETAIL(),
-                element: <RequestDetail />,
-            },
+
             {
                 path: paths.SETTING.CONTACT.CREATE,
                 element: <ContactCreate />,
@@ -294,18 +256,7 @@ export const router = createBrowserRouter([
                 path: paths.SETTING.CONTACT.EDIT(),
                 element: <ContactEdit />,
             },
-            {
-                path: paths.PROMO_CODES.LIST,
-                element: <PromoCodeList />,
-            },
-            {
-                path: paths.PROMO_CODES.CREATE,
-                element: <PromoCodeCreate />,
-            },
-            {
-                path: paths.PROMO_CODES.EDIT(),
-                element: <PromoCodeUpdate />,
-            },
+
             {
                 path: paths.CUSTOM_PLACE.LIST,
                 element: <PlaceList />,

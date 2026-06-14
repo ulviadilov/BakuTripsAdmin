@@ -1,6 +1,6 @@
 export const QUERY_KEYS = {
     category: "category",
-    user: "user",
+
     contact: "contact",
     orders: {
         all: ["orders"] as const,
@@ -11,9 +11,7 @@ export const QUERY_KEYS = {
     },
     groupTour: "groupTour",
     package: "package",
-    partner: {
-        all: ["partner"] as const,
-    },
+
     tour: {
         all: ["tour"] as const,
         select: ["select"] as const,
@@ -36,9 +34,7 @@ export const QUERY_KEYS = {
         detail: (id: string) =>
             [...QUERY_KEYS.destination.details(), id] as const,
     },
-    promoCode: {
-        all: ["promo-code"] as const,
-    },
+
     slider: {
         all: ["slider"] as const,
     },
@@ -46,9 +42,7 @@ export const QUERY_KEYS = {
         all: ["custom-places"] as const,
         detail: (id: string) => ["custom-places", "detail", id] as const,
     },
-    member: {
-        all: ["member"] as const,
-    },
+
     guide: {
         all: ["guide"] as const,
     },
