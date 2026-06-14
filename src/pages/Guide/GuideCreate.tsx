@@ -127,7 +127,7 @@ export default function GuideCreate() {
                         <Input
                             name="price"
                             control={control}
-                            label="Price"
+                            label="Price ($)"
                             type="number"
                             placeholder="Enter price"
                             required={true}

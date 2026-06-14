@@ -449,7 +449,7 @@ export default function TourUpdate() {
                             <Input
                                 name="priceForAdult"
                                 control={control}
-                                label="Adult Price"
+                                label="Adult Price ($)"
                                 type="number"
                                 placeholder="0.00"
                                 required={true}
@@ -459,7 +459,7 @@ export default function TourUpdate() {
                             <Input
                                 name="priceForChild"
                                 control={control}
-                                label="Child Price"
+                                label="Child Price ($)"
                                 type="number"
                                 placeholder="0.00"
                                 required={true}
@@ -469,7 +469,7 @@ export default function TourUpdate() {
                             <Input
                                 name="priceForInfant"
                                 control={control}
-                                label="Infant Price"
+                                label="Infant Price ($)"
                                 type="number"
                                 placeholder="0.00"
                                 required={true}

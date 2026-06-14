@@ -24,7 +24,7 @@ const columns = [
     },
     {
         key: "basePrice",
-        label: "Base Price",
+        label: "Base Price ($)",
         type: "text" as const
     },
     {

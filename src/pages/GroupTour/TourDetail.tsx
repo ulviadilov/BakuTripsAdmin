@@ -378,7 +378,7 @@ export default function TourDetail() {
                                     </svg>
                                 </div>
                             </div>
-                            <p className="text-3xl font-bold text-blue-900">${tour.priceForAdult}</p>
+                            <p className="text-3xl font-bold text-blue-900">${tour.priceForAdult} $</p>
                             <p className="text-sm text-blue-600 mt-2">Per person (12+ years)</p>
                         </div>
 
@@ -391,7 +391,7 @@ export default function TourDetail() {
                                     </svg>
                                 </div>
                             </div>
-                            <p className="text-3xl font-bold text-purple-900">${tour.priceForChild}</p>
+                            <p className="text-3xl font-bold text-purple-900">${tour.priceForChild} $</p>
                             <p className="text-sm text-purple-600 mt-2">Per child (2-11 years)</p>
                         </div>
 
@@ -405,7 +405,7 @@ export default function TourDetail() {
                                 </div>
                             </div>
                             <p className="text-3xl font-bold text-amber-900">
-                                {tour.priceForInfant > 0 ? `$${tour.priceForInfant}` : 'Free'}
+                                {tour.priceForInfant > 0 ? `${tour.priceForInfant} $` : 'Free'}
                             </p>
                             <p className="text-sm text-amber-600 mt-2">Under 2 years old</p>
                         </div>

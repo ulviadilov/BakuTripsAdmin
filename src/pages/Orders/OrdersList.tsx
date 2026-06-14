@@ -12,7 +12,7 @@ const columns = [
     { key: "customerName", label: "Customer Name", type: "text" as const },
     { key: "customerSurname", label: "Customer Surname", type: "text" as const },
     { key: "status", label: "Status", type: "text" as const },
-    { key: "totalAmount", label: "Total", type: "text" as const },
+    { key: "totalAmount", label: "Total ($)", type: "text" as const },
     { key: "orderItemsCount", label: "Items", type: "text" as const },
     { key: "usedPromocode", label: "Promo", type: "text" as const },
     { key: "createdDate", label: "Created", type: "text" as const },

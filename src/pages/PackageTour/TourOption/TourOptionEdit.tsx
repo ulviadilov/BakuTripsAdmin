@@ -439,7 +439,7 @@ export default function TourOptionEdit() {
                             <Input
                                 name="price"
                                 control={control}
-                                label="Price"
+                                label="Price ($)"
                                 type="number"
                                 placeholder="Enter price"
                                 required={true}

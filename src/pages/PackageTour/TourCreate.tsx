@@ -192,7 +192,7 @@ export default function TourCreate() {
                             <Input
                                 name="basePrice"
                                 control={control}
-                                label="Base Price"
+                                label="Base Price ($)"
                                 type="number"
                                 placeholder="Enter Base Price"
                                 required={true}

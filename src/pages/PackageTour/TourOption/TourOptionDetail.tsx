@@ -218,7 +218,7 @@ export default function TourOptionDetail() {
                                     </svg>
                                 </div>
                             </div>
-                            <p className="text-3xl font-bold text-blue-900">${option.price}</p>
+                            <p className="text-3xl font-bold text-blue-900">${option.price} $</p>
                             <p className="text-sm text-blue-600 mt-2">Per person</p>
                         </div>
                     </div>

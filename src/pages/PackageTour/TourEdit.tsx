@@ -265,7 +265,7 @@ export default function TourUpdate() {
                             <Input
                                 name="basePrice"
                                 control={control}
-                                label="Base Price"
+                                label="Base Price ($)"
                                 type="number"
                                 placeholder="0.00"
                                 required={true}

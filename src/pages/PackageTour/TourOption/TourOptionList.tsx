@@ -18,7 +18,7 @@ const columns = [
     },
     {
         key: "price",
-        label: "Price",
+        label: "Price ($)",
         type: "text" as const,
     },
     {
